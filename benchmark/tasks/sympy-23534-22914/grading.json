@@ -1,0 +1,37 @@
+{
+ "FAIL_TO_PASS": [
+  "test_symbols",
+  "test_PythonCodePrinter"
+ ],
+ "PASS_TO_PASS": [
+  "test_Dummy",
+  "test_Dummy_force_dummy_index",
+  "test_Integral",
+  "test_MpmathPrinter",
+  "test_NumPyPrinter",
+  "test_NumPyPrinter_print_seq",
+  "test_PythonCodePrinter_standard",
+  "test_SciPyPrinter",
+  "test_Str",
+  "test_Symbol",
+  "test_Wild_properties",
+  "test_airy",
+  "test_airy_prime",
+  "test_beta",
+  "test_codegen_ast_nodes",
+  "test_frac",
+  "test_fresnel_integrals",
+  "test_ineq_unequal",
+  "test_issue_14283",
+  "test_issue_16535_16536",
+  "test_lt_gt",
+  "test_no_len",
+  "test_numerical_accuracy_functions",
+  "test_printmethod",
+  "test_pycode_reserved_words",
+  "test_sqrt",
+  "test_symbols_become_functions_issue_3539",
+  "test_unicode",
+  "test_uniquely_named_symbol_and_Symbol"
+ ]
+}

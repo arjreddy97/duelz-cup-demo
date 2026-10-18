@@ -1,0 +1,13 @@
+diff --git a/sympy/printing/pycode.py b/sympy/printing/pycode.py
+index 1877c3f92a57fc8d2bb56890780b2cf827e245c1..e82e7226865c212dfa2720c7781959cc4a7133de 100644
+--- a/sympy/printing/pycode.py
++++ b/sympy/printing/pycode.py
+@@ -19,8 +19,6 @@ _kw = {
+ 
+ _known_functions = {
+     'Abs': 'abs',
+-    'Min': 'min',
+-    'Max': 'max',
+ }
+ _known_functions_math = {
+     'acos': 'acos',

@@ -1,0 +1,32 @@
+diff --git a/src/_pytest/logging.py b/src/_pytest/logging.py
+index f9091399f2ca691a43c7741233c1dbc9f4c112ca..c1ba018d90e7c176fe930deeed696f751f6cf1c2 100644
+--- a/src/_pytest/logging.py
++++ b/src/_pytest/logging.py
+@@ -42,6 +42,7 @@ if TYPE_CHECKING:
+ else:
+     logging_StreamHandler = logging.StreamHandler
+ 
++
+ DEFAULT_LOG_FORMAT = "%(levelname)-8s %(name)s:%(filename)s:%(lineno)d %(message)s"
+ DEFAULT_LOG_DATE_FORMAT = "%H:%M:%S"
+ _ANSI_ESCAPE_SEQ = re.compile(r"\x1b\[[\d;]+m")
+@@ -346,10 +347,6 @@ class LogCaptureHandler(logging_StreamHandler):
+         self.records = []
+         self.stream = StringIO()
+ 
+-    def clear(self) -> None:
+-        self.records.clear()
+-        self.stream = StringIO()
+-
+     def handleError(self, record: logging.LogRecord) -> None:
+         if logging.raiseExceptions:
+             # Fail the test if the log message is bad (emit failed).
+@@ -444,7 +441,7 @@ class LogCaptureFixture:
+ 
+     def clear(self) -> None:
+         """Reset the list of log records and the captured log text."""
+-        self.handler.clear()
++        self.handler.reset()
+ 
+     def set_level(self, level: Union[int, str], logger: Optional[str] = None) -> None:
+         """Set the level of a logger for the duration of a test.

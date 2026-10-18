@@ -1,0 +1,57 @@
+diff --git a/django/contrib/admin/checks.py b/django/contrib/admin/checks.py
+index 45d895dff066e5d8b4ed60375b9b8c46e366894f..8c39fa5aa0018c3d73835438b5d163a6680af69a 100644
+--- a/django/contrib/admin/checks.py
++++ b/django/contrib/admin/checks.py
+@@ -781,11 +781,10 @@ class BaseModelAdminChecks:
+             except FieldDoesNotExist:
+                 return [
+                     checks.Error(
+-                        "The value of '%s' refers to '%s', which is not a callable, "
+-                        "an attribute of '%s', or an attribute of '%s'."
++                        "The value of '%s' is not a callable, an attribute of "
++                        "'%s', or an attribute of '%s'."
+                         % (
+                             label,
+-                            field_name,
+                             obj.__class__.__name__,
+                             obj.model._meta.label,
+                         ),
+diff --git a/django/db/models/manager.py b/django/db/models/manager.py
+index 467e79f9b9f7773598595ae364fe391ded78aeaf..e37e56cd17acbd5019eeddb6fc299171d422d836 100644
+--- a/django/db/models/manager.py
++++ b/django/db/models/manager.py
+@@ -1,6 +1,5 @@
+ import copy
+ import inspect
+-from functools import wraps
+ from importlib import import_module
+ 
+ from django.db import router
+@@ -82,10 +81,11 @@ class BaseManager:
+     @classmethod
+     def _get_queryset_methods(cls, queryset_class):
+         def create_method(name, method):
+-            @wraps(method)
+             def manager_method(self, *args, **kwargs):
+                 return getattr(self.get_queryset(), name)(*args, **kwargs)
+ 
++            manager_method.__name__ = method.__name__
++            manager_method.__doc__ = method.__doc__
+             return manager_method
+ 
+         new_methods = {}
+diff --git a/django/forms/formsets.py b/django/forms/formsets.py
+index fd4d53a44f70e96eab04e87b2f3f9e54a0e252f3..235aaf844c7269c48c7efdf549ecadbd7a7cb290 100644
+--- a/django/forms/formsets.py
++++ b/django/forms/formsets.py
+@@ -490,9 +490,7 @@ class BaseFormSet(RenderableFormMixin):
+                     required=False,
+                     widget=self.get_ordering_widget(),
+                 )
+-        if self.can_delete and (
+-            self.can_delete_extra or (index is not None and index < initial_form_count)
+-        ):
++        if self.can_delete and (self.can_delete_extra or index < initial_form_count):
+             form.fields[DELETION_FIELD_NAME] = BooleanField(
+                 label=_("Delete"),
+                 required=False,

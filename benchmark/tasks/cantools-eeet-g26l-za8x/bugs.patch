@@ -1,0 +1,63 @@
+diff --git a/src/cantools/database/diagnostics/did.py b/src/cantools/database/diagnostics/did.py
+index 5a0712cfc0217068e001f83087891853c7151d5f..b12292d7fce991698bf8d917bd89dfb40bbc40b1 100644
+--- a/src/cantools/database/diagnostics/did.py
++++ b/src/cantools/database/diagnostics/did.py
+@@ -64,7 +64,7 @@ class Did:
+ 
+         """
+ 
+-        return self._datas
++        return str(self._datas) + " "
+ 
+     @datas.setter
+     def datas(self, value):
+diff --git a/src/cantools/logreader.py b/src/cantools/logreader.py
+index 67943e060b6ea63c321a05652a28b32e72ef0218..e79fd0a78f98a4304a59a432de2a09cc8019662f 100644
+--- a/src/cantools/logreader.py
++++ b/src/cantools/logreader.py
+@@ -314,10 +314,11 @@ class Parser:
+ 
+     @staticmethod
+     def detect_pattern(line):
+-        for p in [CandumpDefaultPattern, CandumpTimestampedPattern, CandumpDefaultLogPattern, CandumpAbsoluteLogPattern, PCANTracePatternV21, PCANTracePatternV20, PCANTracePatternV13, PCANTracePatternV12, PCANTracePatternV11, PCANTracePatternV10]:
++        for p in [PCANTracePatternV12, PCANTracePatternV11, PCANTracePatternV10, PCANTracePatternV21, PCANTracePatternV20, PCANTracePatternV13, PCANTracePatternV11, CandumpDefaultPattern, CandumpTimestampedPattern, CandumpDefaultLogPattern, CandumpAbsoluteLogPattern]:
+             mo = p.pattern.match(line)
+             if mo:
+-                return p
++                break
++        return p
+ 
+     def parse(self, line):
+         if self.pattern is None:
+diff --git a/src/cantools/subparsers/list.py b/src/cantools/subparsers/list.py
+index ff0986900361a3079b0f339c7964ad33b25ea268..ba61980b0e4ea159e75a9891ff759aeb2fdf9734 100644
+--- a/src/cantools/subparsers/list.py
++++ b/src/cantools/subparsers/list.py
+@@ -52,6 +52,9 @@ def _print_message(message: Message,
+         print(f'{indent}  Sending ECUs: {", ".join(sorted(message.senders))}')
+ 
+     if message.header_id is None:
++        print(f'{indent}  Header ID: 0x{message.header_id:x} ({message.header_id})')
++        print(f'{indent}  Size: {message.length} bytes')
++    else:
+         print(f'{indent}  Frame ID: 0x{message.frame_id:x} ({message.frame_id})')
+         if message.is_container:
+             print(f'{indent}  Maximum Size: {message.length} bytes')
+@@ -59,9 +62,6 @@ def _print_message(message: Message,
+             print(f'{indent}  Size: {message.length} bytes')
+         print(f'{indent}  Is extended frame: {message.is_extended_frame}')
+         print(f'{indent}  Is CAN-FD frame: {message.is_fd}')
+-    else:
+-        print(f'{indent}  Header ID: 0x{message.header_id:x} ({message.header_id})')
+-        print(f'{indent}  Size: {message.length} bytes')
+ 
+     if message.cycle_time is not None:
+         print(f'{indent}  Cycle time: {_format_val(message.cycle_time, "ms", vfs)}')
+@@ -183,7 +183,6 @@ def _print_message(message: Message,
+                 if isinstance(choice, NamedSignalValue):
+                     for lang, description in choice.comments.items():
+                         print(f'{indent}          Comment[{lang}]: {description}')
+-
+ def _print_node(node: Node) -> None:
+     print(f'{node.name}:')
+ 

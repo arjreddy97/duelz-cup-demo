@@ -45,6 +45,12 @@ excluded and footnoted on the page. Gemini CLI times exclude its rate-limit retr
 `app/static/bench-results.json` and `app/static/replays.json` hold these aggregate numbers; they are
 exported from the private benchmark records, which are not part of this repo.
 
+## Benchmark data
+
+[`benchmark/`](benchmark/) has the 11 Gemini tasks (SWE-bench Verified and SWE-smith instance IDs, the patch that
+stacks their bugs, the hidden tests and grading lists) and per-task results for both sides, so the 0.34x figures can
+be checked by hand. See [`benchmark/README.md`](benchmark/README.md).
+
 ## Run locally
 
 Needs Python 3.11+.

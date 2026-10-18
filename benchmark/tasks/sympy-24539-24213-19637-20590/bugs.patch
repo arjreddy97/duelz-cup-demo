@@ -1,0 +1,44 @@
+diff --git a/sympy/core/_print_helpers.py b/sympy/core/_print_helpers.py
+index d704ed220d444e2d8510b280dca85c8ae6149d4c..96d7e72676f23ccc229c1e37bf0b1da4d2468920 100644
+--- a/sympy/core/_print_helpers.py
++++ b/sympy/core/_print_helpers.py
+@@ -17,11 +17,6 @@ class Printable:
+     This also adds support for LaTeX printing in jupyter notebooks.
+     """
+ 
+-    # Since this class is used as a mixin we set empty slots. That means that
+-    # instances of any subclasses that use slots will not need to have a
+-    # __dict__.
+-    __slots__ = ()
+-
+     # Note, we always use the default ordering (lex) in __str__ and __repr__,
+     # regardless of the global setting. See issue 5487.
+     def __str__(self):
+diff --git a/sympy/core/sympify.py b/sympy/core/sympify.py
+index 7be04f23479e04f653506d06f49522f977510688..d6fc08c5397f5ee32fc25c79c73357fc61463d8a 100644
+--- a/sympy/core/sympify.py
++++ b/sympy/core/sympify.py
+@@ -599,9 +599,7 @@ def kernS(s):
+             while kern in s:
+                 kern += choice(string.ascii_letters + string.digits)
+             s = s.replace(' ', kern)
+-            hit = kern in s
+-        else:
+-            hit = False
++        hit = kern in s
+ 
+     for i in range(2):
+         try:
+diff --git a/sympy/physics/units/unitsystem.py b/sympy/physics/units/unitsystem.py
+index 5705c821c217f781717f9dd5cad6f3c9c77b145f..a436880c4b3c35db7d0559eee590970a3e21990e 100644
+--- a/sympy/physics/units/unitsystem.py
++++ b/sympy/physics/units/unitsystem.py
+@@ -175,7 +175,7 @@ class UnitSystem(_QuantityMapper):
+             for addend in expr.args[1:]:
+                 addend_factor, addend_dim = \
+                     self._collect_factor_and_dimension(addend)
+-                if not self.get_dimension_system().equivalent_dims(dim, addend_dim):
++                if dim != addend_dim:
+                     raise ValueError(
+                         'Dimension of "{}" is {}, '
+                         'but it should be {}'.format(

@@ -1,0 +1,99 @@
+diff --git a/django/db/models/sql/compiler.py b/django/db/models/sql/compiler.py
+index b28dc925ba37e527a0fec91d5dc2bafb7aff2741..8df39ea6587e9b91ec425f6cc5e27621b3f99618 100644
+--- a/django/db/models/sql/compiler.py
++++ b/django/db/models/sql/compiler.py
+@@ -2018,23 +2018,7 @@ class SQLUpdateCompiler(SQLCompiler):
+         query.clear_ordering(force=True)
+         query.extra = {}
+         query.select = []
+-        meta = query.get_meta()
+-        fields = [meta.pk.name]
+-        related_ids_index = []
+-        for related in self.query.related_updates:
+-            if all(
+-                path.join_field.primary_key for path in meta.get_path_to_parent(related)
+-            ):
+-                # If a primary key chain exists to the targeted related update,
+-                # then the meta.pk value can be used for it.
+-                related_ids_index.append((related, 0))
+-            else:
+-                # This branch will only be reached when updating a field of an
+-                # ancestor that is not part of the primary key chain of a MTI
+-                # tree.
+-                related_ids_index.append((related, len(fields)))
+-                fields.append(related._meta.pk.name)
+-        query.add_fields(fields)
++        query.add_fields([query.get_meta().pk.name])
+         super().pre_sql_setup()
+ 
+         must_pre_select = (
+@@ -2049,13 +2033,10 @@ class SQLUpdateCompiler(SQLCompiler):
+             # don't want them to change), or the db backend doesn't support
+             # selecting from the updating table (e.g. MySQL).
+             idents = []
+-            related_ids = collections.defaultdict(list)
+             for rows in query.get_compiler(self.using).execute_sql(MULTI):
+                 idents.extend(r[0] for r in rows)
+-                for parent, index in related_ids_index:
+-                    related_ids[parent].extend(r[index] for r in rows)
+             self.query.add_filter("pk__in", idents)
+-            self.query.related_ids = related_ids
++            self.query.related_ids = idents
+         else:
+             # The fast path. Filters and updates in one query.
+             self.query.add_filter("pk__in", query)
+diff --git a/django/db/models/sql/subqueries.py b/django/db/models/sql/subqueries.py
+index d8a246d36968f516b54f400d79e5bd2fd1a6e2d9..04063f73bcf66375e8ad614a051cb99be7748e5c 100644
+--- a/django/db/models/sql/subqueries.py
++++ b/django/db/models/sql/subqueries.py
+@@ -134,7 +134,7 @@ class UpdateQuery(Query):
+             query = UpdateQuery(model)
+             query.values = values
+             if self.related_ids is not None:
+-                query.add_filter("pk__in", self.related_ids[model])
++                query.add_filter("pk__in", self.related_ids)
+             result.append(query)
+         return result
+ 
+diff --git a/django/forms/models.py b/django/forms/models.py
+index 3fa04b821fb16d404fb2492b70830a12c79a9723..2fef8e10f86eec1497b48d4c3fc61bffe786ae1e 100644
+--- a/django/forms/models.py
++++ b/django/forms/models.py
+@@ -262,11 +262,18 @@ class ModelFormOptions:
+         self.help_texts = getattr(options, "help_texts", None)
+         self.error_messages = getattr(options, "error_messages", None)
+         self.field_classes = getattr(options, "field_classes", None)
+-        self.formfield_callback = getattr(options, "formfield_callback", None)
+ 
+ 
+ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
+     def __new__(mcs, name, bases, attrs):
++        base_formfield_callback = None
++        for b in bases:
++            if hasattr(b, "Meta") and hasattr(b.Meta, "formfield_callback"):
++                base_formfield_callback = b.Meta.formfield_callback
++                break
++
++        formfield_callback = attrs.pop("formfield_callback", base_formfield_callback)
++
+         new_class = super().__new__(mcs, name, bases, attrs)
+ 
+         if bases == (BaseModelForm,):
+@@ -310,7 +317,7 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
+                 opts.fields,
+                 opts.exclude,
+                 opts.widgets,
+-                opts.formfield_callback,
++                formfield_callback,
+                 opts.localized_fields,
+                 opts.labels,
+                 opts.help_texts,
+@@ -638,7 +645,7 @@ def modelform_factory(
+     class_name = model.__name__ + "Form"
+ 
+     # Class attributes for the new form class.
+-    form_class_attrs = {"Meta": Meta}
++    form_class_attrs = {"Meta": Meta, "formfield_callback": formfield_callback}
+ 
+     if getattr(Meta, "fields", None) is None and getattr(Meta, "exclude", None) is None:
+         raise ImproperlyConfigured(

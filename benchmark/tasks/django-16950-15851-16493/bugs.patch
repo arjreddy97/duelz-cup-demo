@@ -1,0 +1,31 @@
+diff --git a/django/db/backends/postgresql/client.py b/django/db/backends/postgresql/client.py
+index 3b5ddafacaaadeccb1199f898b221e9880c2eae0..4c9bd635465a32473107f779ff8da01bb04715f7 100644
+--- a/django/db/backends/postgresql/client.py
++++ b/django/db/backends/postgresql/client.py
+@@ -32,9 +32,9 @@ class DatabaseClient(BaseDatabaseClient):
+             args += ["-h", host]
+         if port:
+             args += ["-p", str(port)]
+-        args.extend(parameters)
+         if dbname:
+             args += [dbname]
++        args.extend(parameters)
+ 
+         env = {}
+         if passwd:
+diff --git a/django/db/models/fields/files.py b/django/db/models/fields/files.py
+index 95985684ee125fc1bf3b78e0f7b47990e955cafc..d9e110f2107c2f025fcca361daac9d923a593013 100644
+--- a/django/db/models/fields/files.py
++++ b/django/db/models/fields/files.py
+@@ -294,9 +294,8 @@ class FileField(Field):
+         if kwargs.get("max_length") == 100:
+             del kwargs["max_length"]
+         kwargs["upload_to"] = self.upload_to
+-        storage = getattr(self, "_storage_callable", self.storage)
+-        if storage is not default_storage:
+-            kwargs["storage"] = storage
++        if self.storage is not default_storage:
++            kwargs["storage"] = getattr(self, "_storage_callable", self.storage)
+         return name, path, args, kwargs
+ 
+     def get_internal_type(self):

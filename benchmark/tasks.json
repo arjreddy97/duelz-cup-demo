@@ -1,0 +1,300 @@
+{
+  "model": "gemini-3.8-flash",
+  "tasks": [
+    {
+      "task": "cantools-eeet-g26l-za8x",
+      "source": "SWE-smith",
+      "repo": "swesmith/cantools__cantools.0c6a7871",
+      "instances": [
+        "cantools__cantools.0c6a7871.func_pm_ctrl_invert_if__eeetogwk",
+        "cantools__cantools.0c6a7871.func_basic__g26ljtfg",
+        "cantools__cantools.0c6a7871.func_basic__za8xyp1u"
+      ],
+      "issues": [
+        "Pattern detection returns wrong pattern when no match found",
+        "List command crashes when displaying messages with header_id None",
+        "DID datas property returns string representation instead of list"
+      ],
+      "start_image": "jyangballin/swesmith.x86_64.cantools_1776_cantools.0c6a7871",
+      "start_commit": "2fb1682c99b2933dbcbccee84ab3a30c0b388afa",
+      "check": "set -o pipefail && pytest -rA --color=no -p no:cacheprovider tests/test_list.py tests/test_diagnostics_database.py tests/test_logreader.py",
+      "files": {
+        "bugs_patch": "tasks/cantools-eeet-g26l-za8x/bugs.patch",
+        "tests_patch": "tasks/cantools-eeet-g26l-za8x/tests.patch",
+        "problem": "tasks/cantools-eeet-g26l-za8x/problem.md",
+        "grading": "tasks/cantools-eeet-g26l-za8x/grading.json"
+      }
+    },
+    {
+      "task": "django-16662-16429-16100-15525",
+      "source": "SWE-bench Verified",
+      "repo": "django/django",
+      "instances": [
+        "django__django-16662",
+        "django__django-16429",
+        "django__django-16100",
+        "django__django-15525"
+      ],
+      "issues": [
+        "Add transaction handling to Changelist list_editable processing.",
+        "Migration import ordering violates coding style and isort defaults",
+        "loaddata fails on non-default database when natural keys uses foreign keys.",
+        "timesince() raises TypeError with USE_TZ=True and >1 month interval."
+      ],
+      "start_image": "swebench/sweb.eval.x86_64.django_1776_django-16662:latest",
+      "start_commit": "0eb3e9bd754e4c9fac8b616b705178727fc8031e",
+      "check": "set -o pipefail && ./tests/runtests.py --verbosity 2 --settings=test_sqlite --parallel 1 migrations.test_writer utils_tests.test_timesince admin_changelist.tests backends.sqlite.test_features fixtures_regress.models fixtures_regress.tests",
+      "files": {
+        "bugs_patch": "tasks/django-16662-16429-16100-15525/bugs.patch",
+        "tests_patch": "tasks/django-16662-16429-16100-15525/tests.patch",
+        "problem": "tasks/django-16662-16429-16100-15525/problem.md",
+        "grading": "tasks/django-16662-16429-16100-15525/grading.json"
+      }
+    },
+    {
+      "task": "django-16801-15732-15467",
+      "source": "SWE-bench Verified",
+      "repo": "django/django",
+      "instances": [
+        "django__django-16801",
+        "django__django-15732",
+        "django__django-15467"
+      ],
+      "issues": [
+        "Cannot drop unique_together constraint on a single field with its own unique=True constraint",
+        "ImageField unnecessarily adds a post_init signal handler to the model",
+        "ModelAdmin with defined radio_fields override empty_label"
+      ],
+      "start_image": "swebench/sweb.eval.x86_64.django_1776_django-16801:latest",
+      "start_commit": "3b62d8c83e3e48d2ed61cfa32a61c56d9e030293",
+      "check": "set -o pipefail && ./tests/runtests.py --verbosity 2 --settings=test_sqlite --parallel 1 model_fields.test_imagefield migrations.test_operations admin_widgets.tests",
+      "files": {
+        "bugs_patch": "tasks/django-16801-15732-15467/bugs.patch",
+        "tests_patch": "tasks/django-16801-15732-15467/tests.patch",
+        "problem": "tasks/django-16801-15732-15467/problem.md",
+        "grading": "tasks/django-16801-15732-15467/grading.json"
+      }
+    },
+    {
+      "task": "django-16877-15916-15563",
+      "source": "SWE-bench Verified",
+      "repo": "django/django",
+      "instances": [
+        "django__django-16877",
+        "django__django-15916",
+        "django__django-15563"
+      ],
+      "issues": [
+        "Wrong behavior on queryset update when multiple inheritance",
+        "Allow ModelForm meta to specify formfield_callback.",
+        "New template filter `escapeseq`"
+      ],
+      "start_image": "swebench/sweb.eval.x86_64.django_1776_django-16877:latest",
+      "start_commit": "98f6ada0e2058d67d91fb6c16482411ec2ca0967",
+      "check": "set -o pipefail && ./tests/runtests.py --verbosity 2 --settings=test_sqlite --parallel 1 template_tests.filter_tests.test_escapeseq model_forms.tests model_inheritance_regress.tests",
+      "files": {
+        "bugs_patch": "tasks/django-16877-15916-15563/bugs.patch",
+        "tests_patch": "tasks/django-16877-15916-15563/tests.patch",
+        "problem": "tasks/django-16877-15916-15563/problem.md",
+        "grading": "tasks/django-16877-15916-15563/grading.json"
+      }
+    },
+    {
+      "task": "django-16901-15315-16595",
+      "source": "SWE-bench Verified",
+      "repo": "django/django",
+      "instances": [
+        "django__django-16901",
+        "django__django-15315",
+        "django__django-16595"
+      ],
+      "issues": [
+        "Model Field.__hash__() should be immutable.",
+        "On databases lacking XOR, Q(\u2026) ^ Q(\u2026) ^ Q(\u2026) wrongly interpreted as exactly-one rather than parity",
+        "Migration optimizer does not reduce multiple AlterField"
+      ],
+      "start_image": "swebench/sweb.eval.x86_64.django_1776_django-16901:latest",
+      "start_commit": "ee36e101e8f8c0acde4bb148b738ab7034e902a0",
+      "check": "set -o pipefail && ./tests/runtests.py --verbosity 2 --settings=test_sqlite --parallel 1 xor_lookups.tests model_fields.tests migrations.test_optimizer",
+      "files": {
+        "bugs_patch": "tasks/django-16901-15315-16595/bugs.patch",
+        "tests_patch": "tasks/django-16901-15315-16595/tests.patch",
+        "problem": "tasks/django-16901-15315-16595/problem.md",
+        "grading": "tasks/django-16901-15315-16595/grading.json"
+      }
+    },
+    {
+      "task": "django-16950-15851-16493",
+      "source": "SWE-bench Verified",
+      "repo": "django/django",
+      "instances": [
+        "django__django-16950",
+        "django__django-15851",
+        "django__django-16493"
+      ],
+      "issues": [
+        "Callable storage on FileField fails to deconstruct when it returns default_storage",
+        "Django Admin with Inlines not using UUIDField default value",
+        "dbshell additional parameters should be passed before dbname on PostgreSQL."
+      ],
+      "start_image": "swebench/sweb.eval.x86_64.django_1776_django-16950:latest",
+      "start_commit": "f64fd47a7627ed6ffe2df2a32ded6ee528a784eb",
+      "check": "set -o pipefail && ./tests/runtests.py --verbosity 2 --settings=test_sqlite --parallel 1 model_formsets.test_uuid dbshell.test_postgresql file_storage.models file_storage.tests",
+      "files": {
+        "bugs_patch": "tasks/django-16950-15851-16493/bugs.patch",
+        "tests_patch": "tasks/django-16950-15851-16493/tests.patch",
+        "problem": "tasks/django-16950-15851-16493/problem.md",
+        "grading": "tasks/django-16950-15851-16493/grading.json"
+      }
+    },
+    {
+      "task": "django-17029-15731-16569-16899",
+      "source": "SWE-bench Verified",
+      "repo": "django/django",
+      "instances": [
+        "django__django-17029",
+        "django__django-15731",
+        "django__django-16569",
+        "django__django-16899"
+      ],
+      "issues": [
+        "inspect.signature() returns incorrect signature on manager methods.",
+        "Formsets' add_fields() method fails in some circumstances if the argument index is None.",
+        "ModelAdmin: Error message for readonly_fields's check does not include the field name",
+        "Apps.clear_cache() does not clear get_swappable_settings_name cache."
+      ],
+      "start_image": "swebench/sweb.eval.x86_64.django_1776_django-17029:latest",
+      "start_commit": "953f29f700a60fc09b08b2c2270c12c447490c6a",
+      "check": "set -o pipefail && ./tests/runtests.py --verbosity 2 --settings=test_sqlite --parallel 1 apps.tests basic.tests forms_tests.tests.test_formsets admin_checks.tests",
+      "files": {
+        "bugs_patch": "tasks/django-17029-15731-16569-16899/bugs.patch",
+        "tests_patch": "tasks/django-17029-15731-16569-16899/tests.patch",
+        "problem": "tasks/django-17029-15731-16569-16899/problem.md",
+        "grading": "tasks/django-17029-15731-16569-16899/grading.json"
+      }
+    },
+    {
+      "task": "pytest-10356-10051",
+      "source": "SWE-bench Verified",
+      "repo": "pytest-dev/pytest",
+      "instances": [
+        "pytest-dev__pytest-10356",
+        "pytest-dev__pytest-10051"
+      ],
+      "issues": [
+        "Consider MRO when obtaining marks for classes",
+        "caplog.get_records and caplog.clear conflict"
+      ],
+      "start_image": "swebench/sweb.eval.x86_64.pytest-dev_1776_pytest-10356:latest",
+      "start_commit": "3c1534944cbd34e8a41bc9e76818018fadefc9a1",
+      "check": "set -o pipefail && pytest -rA testing/test_mark.py testing/logging/test_fixture.py",
+      "files": {
+        "bugs_patch": "tasks/pytest-10356-10051/bugs.patch",
+        "tests_patch": "tasks/pytest-10356-10051/tests.patch",
+        "problem": "tasks/pytest-10356-10051/problem.md",
+        "grading": "tasks/pytest-10356-10051/grading.json"
+      }
+    },
+    {
+      "task": "scikit-learn-25973-25232-25747-25931",
+      "source": "SWE-bench Verified",
+      "repo": "scikit-learn/scikit-learn",
+      "instances": [
+        "scikit-learn__scikit-learn-25973",
+        "scikit-learn__scikit-learn-25232",
+        "scikit-learn__scikit-learn-25747",
+        "scikit-learn__scikit-learn-25931"
+      ],
+      "issues": [
+        "FeatureUnion not working when aggregating data and pandas transform output selected",
+        "X does not have valid feature names, but IsolationForest was fitted with feature names",
+        "IterativeImputer has no parameter \"fill_value\"",
+        "Unable to pass splits to SequentialFeatureSelector"
+      ],
+      "start_image": "swebench/sweb.eval.x86_64.scikit-learn_1776_scikit-learn-25973:latest",
+      "start_commit": "10dbc142bd17ccf7bd38eec2ac04b52ce0d1009e",
+      "check": "set -o pipefail && pytest -rA sklearn/feature_selection/tests/test_sequential.py sklearn/impute/tests/test_impute.py sklearn/utils/tests/test_set_output.py sklearn/ensemble/tests/test_iforest.py",
+      "files": {
+        "bugs_patch": "tasks/scikit-learn-25973-25232-25747-25931/bugs.patch",
+        "tests_patch": "tasks/scikit-learn-25973-25232-25747-25931/tests.patch",
+        "problem": "tasks/scikit-learn-25973-25232-25747-25931/problem.md",
+        "grading": "tasks/scikit-learn-25973-25232-25747-25931/grading.json"
+      }
+    },
+    {
+      "task": "sympy-23534-22914",
+      "source": "SWE-bench Verified",
+      "repo": "sympy/sympy",
+      "instances": [
+        "sympy__sympy-23534",
+        "sympy__sympy-22914"
+      ],
+      "issues": [
+        "Using symbols to create functions doesn't work if there is an extra layer of parentheses",
+        "PythonCodePrinter doesn't support Min and Max"
+      ],
+      "start_image": "swebench/sweb.eval.x86_64.sympy_1776_sympy-23534:latest",
+      "start_commit": "832c24fec1046eaa544a4cab4c69e3af3e651759",
+      "check": "set -o pipefail && PYTHONWARNINGS='ignore::UserWarning,ignore::SyntaxWarning' bin/test -C --verbose sympy/core/tests/test_symbol.py sympy/printing/tests/test_pycode.py",
+      "files": {
+        "bugs_patch": "tasks/sympy-23534-22914/bugs.patch",
+        "tests_patch": "tasks/sympy-23534-22914/tests.patch",
+        "problem": "tasks/sympy-23534-22914/problem.md",
+        "grading": "tasks/sympy-23534-22914/grading.json"
+      }
+    },
+    {
+      "task": "sympy-24562-16792-19954-22714",
+      "source": "SWE-bench Verified",
+      "repo": "sympy/sympy",
+      "instances": [
+        "sympy__sympy-24562",
+        "sympy__sympy-16792",
+        "sympy__sympy-19954",
+        "sympy__sympy-22714"
+      ],
+      "issues": [
+        "autowrap with cython backend fails when array arguments do not appear in wrapped expr",
+        "sylow_subgroup() IndexError",
+        "Rational calc value error",
+        "simpify gives `Imaginary coordinates are not permitted.` with evaluate(False)"
+      ],
+      "start_image": "swebench/sweb.eval.x86_64.sympy_1776_sympy-24562:latest",
+      "start_commit": "b1cb676cf92dd1a48365b731979833375b188bf2",
+      "check": "set -o pipefail && PYTHONWARNINGS='ignore::UserWarning,ignore::SyntaxWarning' bin/test -C --verbose sympy/core/tests/test_numbers.py sympy/utilities/tests/test_codegen.py sympy/combinatorics/tests/test_perm_groups.py sympy/geometry/tests/test_point.py",
+      "files": {
+        "bugs_patch": "tasks/sympy-24562-16792-19954-22714/bugs.patch",
+        "tests_patch": "tasks/sympy-24562-16792-19954-22714/tests.patch",
+        "problem": "tasks/sympy-24562-16792-19954-22714/problem.md",
+        "grading": "tasks/sympy-24562-16792-19954-22714/grading.json"
+      }
+    },
+    {
+      "task": "sympy-24539-24213-19637-20590",
+      "source": "SWE-bench Verified",
+      "repo": "sympy/sympy",
+      "instances": [
+        "sympy__sympy-24539",
+        "sympy__sympy-24213",
+        "sympy__sympy-19637",
+        "sympy__sympy-20590"
+      ],
+      "issues": [
+        "Symbol instances have __dict__ since 1.7?",
+        "`PolyElement.as_expr()` not accepting symbols",
+        "kernS: 'kern' referenced before assignment",
+        "collect_factor_and_dimension does not detect equivalent dimensions in addition"
+      ],
+      "start_image": "swebench/sweb.eval.x86_64.sympy_1776_sympy-24539:latest",
+      "start_commit": "193e3825645d93c73e31cdceb6d742cc6919624d",
+      "check": "set -o pipefail && PYTHONWARNINGS='ignore::UserWarning,ignore::SyntaxWarning' bin/test -C --verbose sympy/polys/tests/test_rings.py sympy/physics/units/tests/test_quantities.py sympy/core/tests/test_sympify.py sympy/core/tests/test_basic.py",
+      "files": {
+        "bugs_patch": "tasks/sympy-24539-24213-19637-20590/bugs.patch",
+        "tests_patch": "tasks/sympy-24539-24213-19637-20590/tests.patch",
+        "problem": "tasks/sympy-24539-24213-19637-20590/problem.md",
+        "grading": "tasks/sympy-24539-24213-19637-20590/grading.json"
+      },
+      "excluded": "Duelz run crashed after 1s (infrastructure, never started); not in the comparison"
+    }
+  ]
+}

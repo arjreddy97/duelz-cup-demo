@@ -1,0 +1,12 @@
+task,source,bugs,gemini_cli_solved,gemini_cli_cost_usd,gemini_cli_seconds_raw,gemini_cli_rate_limit_wait_seconds,gemini_cli_seconds,duelz_solved,duelz_cost_usd,duelz_seconds,cost_ratio,time_ratio
+cantools-eeet-g26l-za8x,SWE-smith,3,True,0.6903,584,193,391,True,0.2667,129,0.386,0.33
+django-16662-16429-16100-15525,SWE-bench Verified,4,True,0.9441,657,150,507,True,0.4635,151,0.491,0.298
+django-16801-15732-15467,SWE-bench Verified,3,True,1.065,879,114,765,True,0.3158,198,0.297,0.259
+django-16877-15916-15563,SWE-bench Verified,3,True,1.7817,1053,221,832,True,0.4029,179,0.226,0.215
+django-16901-15315-16595,SWE-bench Verified,3,True,0.5479,499,109,390,True,0.25,331,0.456,0.849
+django-16950-15851-16493,SWE-bench Verified,3,True,0.8543,598,34,564,True,0.2806,212,0.328,0.376
+django-17029-15731-16569-16899,SWE-bench Verified,4,True,0.5055,285,34,251,True,0.1312,166,0.26,0.661
+pytest-10356-10051,SWE-bench Verified,2,True,0.9629,657,82,575,True,0.4466,193,0.464,0.336
+scikit-learn-25973-25232-25747-25931,SWE-bench Verified,4,True,1.8569,1218,287,931,True,0.8214,400,0.442,0.43
+sympy-23534-22914,SWE-bench Verified,2,True,0.6258,543,153,390,True,0.0561,68,0.09,0.174
+sympy-24562-16792-19954-22714,SWE-bench Verified,4,True,1.8046,1203,239,964,True,0.4905,231,0.272,0.24

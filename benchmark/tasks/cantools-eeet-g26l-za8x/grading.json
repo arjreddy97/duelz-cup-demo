@@ -1,0 +1,43 @@
+{
+ "FAIL_TO_PASS": [
+  "tests/test_list.py::CanToolsListTest::test_arxml4",
+  "tests/test_list.py::CanToolsListTest::test_dbc",
+  "tests/test_list.py::CanToolsListTest::test_kcd",
+  "tests/test_diagnostics_database.py::CanToolsDiagnosticsDatabaseTest::test_be_example_cdd",
+  "tests/test_diagnostics_database.py::CanToolsDiagnosticsDatabaseTest::test_be_example_cdd_repr",
+  "tests/test_diagnostics_database.py::CanToolsDiagnosticsDatabaseTest::test_datarefs",
+  "tests/test_diagnostics_database.py::CanToolsDiagnosticsDatabaseTest::test_le_example_cdd",
+  "tests/test_diagnostics_database.py::CanToolsDiagnosticsDatabaseTest::test_le_example_cdd_repr",
+  "tests/test_logreader.py::TestLogreaderStreams::test_pcan_traceV10",
+  "tests/test_logreader.py::TestLogreaderStreams::test_pcan_traceV11",
+  "tests/test_logreader.py::TestLogreaderStreams::test_pcan_traceV12",
+  "tests/test_logreader.py::TestLogreaderStreams::test_pcan_traceV13",
+  "tests/test_logreader.py::TestLogreaderStreams::test_pcan_traceV20",
+  "tests/test_logreader.py::TestLogreaderStreams::test_pcan_traceV21"
+ ],
+ "PASS_TO_PASS": [
+  "tests/test_diagnostics_database.py::CanToolsDiagnosticsDatabaseTest::test_be_cdd_add",
+  "tests/test_diagnostics_database.py::CanToolsDiagnosticsDatabaseTest::test_le_cdd_add",
+  "tests/test_diagnostics_database.py::CanToolsDiagnosticsDatabaseTest::test_unknown_byteorder",
+  "tests/test_list.py::CanToolsListTest::test_arxml3",
+  "tests/test_logreader.py::TestLogreaderFormats::test_candump",
+  "tests/test_logreader.py::TestLogreaderFormats::test_candump_log",
+  "tests/test_logreader.py::TestLogreaderFormats::test_candump_log_absolute_timestamp",
+  "tests/test_logreader.py::TestLogreaderFormats::test_candump_log_ascii",
+  "tests/test_logreader.py::TestLogreaderFormats::test_candump_log_ascii_absolute",
+  "tests/test_logreader.py::TestLogreaderFormats::test_candump_log_ascii_timestamped",
+  "tests/test_logreader.py::TestLogreaderFormats::test_empty_line",
+  "tests/test_logreader.py::TestLogreaderFormats::test_pcan_traceV10",
+  "tests/test_logreader.py::TestLogreaderFormats::test_pcan_traceV11",
+  "tests/test_logreader.py::TestLogreaderFormats::test_pcan_traceV12",
+  "tests/test_logreader.py::TestLogreaderFormats::test_pcan_traceV13",
+  "tests/test_logreader.py::TestLogreaderFormats::test_pcan_traceV20",
+  "tests/test_logreader.py::TestLogreaderFormats::test_pcan_traceV21",
+  "tests/test_logreader.py::TestLogreaderFormats::test_timestamped_candump",
+  "tests/test_logreader.py::TestLogreaderStreams::test_candump",
+  "tests/test_logreader.py::TestLogreaderStreams::test_candump_absolute_timestamp",
+  "tests/test_logreader.py::TestLogreaderStreams::test_candump_log",
+  "tests/test_logreader.py::TestLogreaderStreams::test_candump_log_fd_absolute_time",
+  "tests/test_logreader.py::TestLogreaderStreams::test_candump_time_since_start"
+ ]
+}

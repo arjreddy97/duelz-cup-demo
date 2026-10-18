@@ -1,0 +1,58 @@
+diff --git a/django/contrib/admin/options.py b/django/contrib/admin/options.py
+index 5240b07cd645305aaa0cac43c0554de5f01aac71..c48b04c92951abd87560c4394aa727d35acbd2b9 100644
+--- a/django/contrib/admin/options.py
++++ b/django/contrib/admin/options.py
+@@ -2024,17 +2024,15 @@ class ModelAdmin(BaseModelAdmin):
+             )
+             if formset.is_valid():
+                 changecount = 0
+-                with transaction.atomic(using=router.db_for_write(self.model)):
+-                    for form in formset.forms:
+-                        if form.has_changed():
+-                            obj = self.save_form(request, form, change=True)
+-                            self.save_model(request, obj, form, change=True)
+-                            self.save_related(request, form, formsets=[], change=True)
+-                            change_msg = self.construct_change_message(
+-                                request, form, None
+-                            )
+-                            self.log_change(request, obj, change_msg)
+-                            changecount += 1
++                for form in formset.forms:
++                    if form.has_changed():
++                        obj = self.save_form(request, form, change=True)
++                        self.save_model(request, obj, form, change=True)
++                        self.save_related(request, form, formsets=[], change=True)
++                        change_msg = self.construct_change_message(request, form, None)
++                        self.log_change(request, obj, change_msg)
++                        changecount += 1
++
+                 if changecount:
+                     msg = ngettext(
+                         "%(count)s %(name)s was changed successfully.",
+diff --git a/django/core/serializers/base.py b/django/core/serializers/base.py
+index 20dffac05f7bae042563e13ba80473abfaad6dd3..32948c121a6d2b4da616aebca58d1a2589a77330 100644
+--- a/django/core/serializers/base.py
++++ b/django/core/serializers/base.py
+@@ -312,9 +312,7 @@ def build_instance(Model, data, db):
+         and hasattr(default_manager, "get_by_natural_key")
+         and hasattr(Model, "natural_key")
+     ):
+-        obj = Model(**data)
+-        obj._state.db = db
+-        natural_key = obj.natural_key()
++        natural_key = Model(**data).natural_key()
+         try:
+             data[Model._meta.pk.attname] = Model._meta.pk.to_python(
+                 default_manager.db_manager(db).get_by_natural_key(*natural_key).pk
+diff --git a/django/utils/timesince.py b/django/utils/timesince.py
+index 7a79e55ad976af2774f49c98cd3e1b92dbbe8212..ee617e77d5ab55a0641a7ffe5d05448ba687cc79 100644
+--- a/django/utils/timesince.py
++++ b/django/utils/timesince.py
+@@ -97,7 +97,6 @@ def timesince(d, now=None, reversed=False, time_strings=None, depth=2):
+             d.hour,
+             d.minute,
+             d.second,
+-            tzinfo=d.tzinfo,
+         )
+     else:
+         pivot = d
