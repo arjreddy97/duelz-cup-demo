@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duelz Live Demo</title>
+<meta name="description" content="One Gemini coding agent versus split-and-verify, live, on a small Python project with six bugs in six files.">
+<link rel="stylesheet" href="/static/style.css?v=202610181140">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='4' fill='%232a78d6'/><path d='M4 4h3v8H4zM9 4h3v3H9zm0 5h3v3H9z' fill='white'/></svg>">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="/">Duelz <span>for Gemini</span></a>
+  <nav><a href="/">Results</a><a href="/replay">Real runs</a><a class="on" href="/demo">Live demo</a></nav>
+</div></header>
+
+<main class="wrap">
+  <div class="hero">
+    <h1>Split, fix, verify. Live.</h1>
+    <p class="lede">A small bundled Python invoicing library has six bugs in six files: rounding, month arithmetic,
+      pagination, accented names, a sort order and a shared default. That is 22 failing pytest tests, plus 21 passing
+      tests that must stay green. Both modes run the same agent loop at the same time: same model,
+      <code id="model">gemini-3.8-flash</code><span id="thinking"> (thinking: low)</span>, same tools (list files, read a file, run tests, edit,
+      finish), one action per turn. Each turn re-sends the conversation so far. Only the harness differs.</p>
+  </div>
+
+  <section class="card" id="bugs-card">
+    <h2>The six bugs</h2>
+    <p class="sub">Planted in <code>invoicer</code>, a small Python invoicing library. The agents never see these descriptions:
+      they get only the code and the failing pytest output, as a real agent would.</p>
+    <div class="tbl-wrap"><table class="bugtable">
+      <tr><th>File</th><th>Bug</th><th>Failing tests</th></tr><tr><td><code>money.py</code></td><td class="wrap">Half a cent is rounded the wrong way (0.125 becomes 0.12, not 0.13).</td><td class="wrap tests">4: <code>sales_tax_on_small_lines</code>, <code>discount_amount</code>, <code>refund_amount</code>, <code>split_uneven_amount</code></td></tr><tr><td><code>dates.py</code></td><td class="wrap">Adding months crashes whenever the result lands in December.</td><td class="wrap tests">4: <code>monthly_schedule_for_new_customer</code>, <code>quarterly_schedule_keeps_month_end</code>, <code>annual_renewal</code>, <code>plan_signed_in_winter</code></td></tr><tr><td><code>paging.py</code></td><td class="wrap">The page count is one too high when rows divide exactly into pages.</td><td class="wrap tests">4: <code>page_counts</code>, <code>last_page_of_twenty_rows</code>, <code>page_past_the_end</code>, <code>report_footer</code></td></tr><tr><td><code>slugs.py</code></td><td class="wrap">Accented letters are dropped instead of turned into plain ones (crème → crme).</td><td class="wrap tests">4: <code>dessert_menu</code>, <code>customer_cities</code>, <code>cafe_variants_collide</code>, <code>department_names</code></td></tr><tr><td><code>ranking.py</code></td><td class="wrap">Customers with equal totals come out in the wrong order.</td><td class="wrap tests">3: <code>equal_totals</code>, <code>leaderboard_lines</code>, <code>cut_falls_inside_a_tie</code></td></tr><tr><td><code>catalog.py</code></td><td class="wrap">Every product shares one tag list, so tagging one tags them all.</td><td class="wrap tests">3: <code>new_products_have_no_tags</code>, <code>clearance_filter</code>, <code>caller_tag_list_untouched</code></td></tr>
+    </table></div>
+    <p class="foot">22 failing tests in all. 21 other tests, including all 5 in <code>test_invoice.py</code> that use several modules
+      together, already pass and must stay green. Done means the full suite passes: 43/43.</p>
+  </section>
+
+  <div class="runbar">
+    <button class="btn" id="go">Run both modes</button>
+    <span class="status" id="status"></span>
+  </div>
+
+  <div class="lanes">
+    <div class="lane" id="lane-single">
+      <h3>Single agent</h3>
+      <p class="desc">One agent gets the whole project and all 22 failures and works through them turn by turn
+        (up to <span id="single-turns">30</span> turns). Every turn re-sends everything so far, so its prompt keeps growing.</p>
+      <div class="meter">
+        <div><div class="k">Tokens</div><div class="v" data-k="tokens">0</div></div>
+        <div><div class="k">Cost</div><div class="v" data-k="cost">$0</div></div>
+        <div><div class="k">Time</div><div class="v" data-k="time">0s</div></div>
+        <div><div class="k">Turns</div><div class="v" data-k="turns">0</div></div>
+      </div>
+      <ul class="tree"></ul>
+      <div class="verdict"></div>
+    </div>
+    <div class="lane" id="lane-split">
+      <h3>Split &amp; verify</h3>
+      <p class="desc">Run pytest, group failures by the source file their traceback ends in, and start one short
+        agent per group, all in parallel (up to <span id="split-turns">12</span> turns each). A branch sees only its
+        group's failures, may edit only its own file, and its tests are the only ones it can run. Then merge, run the
+        full suite, and retry a still-red group once with a fresh agent.</p>
+      <div class="meter">
+        <div><div class="k">Tokens</div><div class="v" data-k="tokens">0</div></div>
+        <div><div class="k">Cost</div><div class="v" data-k="cost">$0</div></div>
+        <div><div class="k">Time</div><div class="v" data-k="time">0s</div></div>
+        <div><div class="k">Turns</div><div class="v" data-k="turns">0</div></div>
+      </div>
+      <ul class="tree"></ul>
+      <div class="verdict"></div>
+    </div>
+  </div>
+
+  <section class="card compare" id="compare" hidden>
+    <h2>This run</h2>
+    <div class="tiles" id="cmp-tiles"></div>
+    <p class="foot" id="cmp-foot"></p>
+  </section>
+
+  <section class="card">
+    <h2>What is being measured</h2>
+    <p class="sub">Tokens come from Gemini's <code>usageMetadata</code> on every call. Dollars use Google's published
+      gemini-3.8-flash prices: <span id="prices">$0.75 per million input tokens, $3.75 per million output tokens
+      (thinking included), $0.075 per million cached tokens</span>. When Gemini's implicit cache serves part of a prompt,
+      those tokens are charged at the cached price, which helps the long conversation most. Time is wall-clock from the
+      first pytest run to the final verdict.</p>
+    <p class="sub">The small bars under each agent are its turns: bar height is the prompt tokens sent that turn, the
+      lighter part is what the cache served. Every agent starts with the files in its scope (the whole project for the
+      single agent, its own file and test file for a branch); tool output is cut at <span id="outcap">4,000</span>
+      characters; each mode stops calling the model once it has spent <span id="cap">$0.25</span>.</p>
+    <p class="sub">Tests run in a throwaway copy of the bundled project with a timeout; agents can only read and write
+      inside it, tests are read-only, and nothing you type is executed. This demo is deliberately simple and generic;
+      the benchmark results on the <a href="/">results page</a> come from Duelz's full engine.</p>
+  </section>
+  <footer>Built for the Google Cloud AI Builder Cup 2026. One live run per visitor per minute.</footer>
+</main>
+<script src="/static/demo.js?v=202610181140"></script>
+</body>
+</html>

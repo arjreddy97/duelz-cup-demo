@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duelz for Gemini</title>
+<meta name="description" content="Split, fix, verify: a smarter harness makes the same Gemini model cheaper and faster than one big agent.">
+<link rel="stylesheet" href="/static/style.css?v=202610181140">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='4' fill='%232a78d6'/><path d='M4 4h3v8H4zM9 4h3v3H9zm0 5h3v3H9z' fill='white'/></svg>">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="/">Duelz <span>for Gemini</span></a>
+  <nav><a class="on" href="/">Results</a><a href="/replay">Real runs</a><a href="/demo">Live demo</a></nav>
+</div></header>
+
+<main class="wrap">
+  <div class="hero">
+    <div class="badge" id="prov">Benchmark results</div>
+    <h1>Same Gemini.<br>3x cheaper. 3x faster.</h1>
+    <p class="lede">Duelz splits a failing test suite by cause, fixes each piece in parallel with a small,
+      focused context, and verifies every piece before merging. Same model, same tasks: one big agent
+      versus a smarter harness.</p>
+    <p class="cta"><a class="btn" href="/replay">Watch a real run</a><a class="btn ghost" href="/demo">Try it live</a></p>
+  </div>
+
+  <section class="card">
+    <h2>How it works</h2>
+    <p class="sub">One agent drags every file and every failure through one ever-growing conversation.
+      Duelz cuts the job into pieces that each fit in a small prompt.</p>
+    <div class="flow" aria-label="Failures, split by cause, parallel fixes, verify">
+      <div class="step"><span class="n">1</span><b>Failures</b><small>Run the tests. Collect every failure and its traceback.</small>
+        <div class="pips"><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i><i class="pip"></i></div></div>
+      <div class="step"><span class="n">2</span><b>Split by cause</b><small>Group failures by the source file the traceback bottoms out in. N failures, fewer bugs.</small>
+        <div class="pips"><i class="pip"></i><i class="pip"></i>&nbsp;<i class="pip"></i><i class="pip"></i><i class="pip"></i>&nbsp;<i class="pip"></i></div></div>
+      <div class="step"><span class="n">3</span><b>Parallel fixes</b><small>Each piece gets only its file and its tests. Cheap, short, simultaneous.</small>
+        <div class="pips"><i class="pip g"></i><i class="pip g"></i>&nbsp;<i class="pip"></i><i class="pip g"></i><i class="pip g"></i>&nbsp;<i class="pip g"></i></div></div>
+      <div class="step"><span class="n">4</span><b>Verify</b><small>Re-run each piece's tests, retry if red, then the full suite before anything ships.</small>
+        <div class="pips"><i class="pip g"></i><i class="pip g"></i><i class="pip g"></i><i class="pip g"></i><i class="pip g"></i><i class="pip g"></i></div></div>
+    </div>
+  </section>
+
+  <section class="card" id="gemini">
+    <h2>Duelz vs Google's Gemini CLI</h2>
+    <p class="sub" id="gem-sub">Both on gemini-3.8-flash. Multi-bug coding tasks.</p>
+    <div class="tiles" id="gem-tiles"></div>
+    <div class="legend"><span><i style="background:var(--accent)"></i>Duelz</span><span><i style="background:var(--baseline)"></i>Gemini CLI</span></div>
+    <div class="charts">
+      <div class="chart"><h3>Cost per task (USD)</h3><div id="gem-cost"></div></div>
+      <div class="chart"><h3>Wall time per task (minutes)</h3><div id="gem-time"></div></div>
+    </div>
+    <details><summary>Per-task table</summary><div class="tbl-wrap"><table id="gem-table"></table></div></details>
+    <p class="foot" id="gem-foot"></p>
+  </section>
+
+  <section class="card" id="real">
+    <h2>Three real runs</h2>
+    <p class="sub">Three tasks from the 25-task Gemini comparison above. Each puts 3–4 real bugs from SWE-bench Verified into one
+      copy of the project; the original hidden tests decide whether each is fixed. Gemini CLI works through the bugs one at a time;
+      Duelz splits the failures by cause and fixes each branch in parallel. Same model, both solved all three.</p>
+    <div class="runs" id="real-runs"></div>
+    <p class="foot"><a href="/replay">Watch these runs replayed →</a></p>
+  </section>
+
+  <section class="card" id="cc">
+    <h2>Duelz vs Claude Code</h2>
+    <p class="sub">Same idea, different model family: both on Claude Haiku 5.5, Claude Code at low effort, 25 multi-bug tasks.</p>
+    <div class="tiles" id="cc-tiles"></div>
+    <p class="foot" id="cc-foot"></p>
+  </section>
+
+  <section class="card" id="babel">
+    <h2>Whole-library build: babel</h2>
+    <p class="sub">A larger job: build to a 5,663-test suite.</p>
+    <div class="tiles" id="babel-tiles"></div>
+    <div class="legend"><span><i style="background:var(--accent)"></i>Duelz</span><span><i style="background:var(--baseline)"></i>Claude Code</span></div>
+    <div class="chart"><h3>Cost of the build (USD)</h3><div id="babel-cost"></div></div>
+    <p class="foot" id="babel-foot"></p>
+  </section>
+
+  <section class="card">
+    <h2>See it run</h2>
+    <p class="sub"><a href="/replay">Real runs</a> replays recorded benchmark runs of the full system. The <a href="/demo">live demo</a> runs a simplified version of the idea, written for this site, side by side on a small bundled Python
+      project with six bugs in six files, as two live Gemini coding agents, and shows the tokens, dollars, time and turns each one spends.</p>
+  </section>
+
+  <footer>
+    Benchmark numbers come from Duelz's private engine; only aggregate per-task cost, time and solved status are shown.
+    This site is a fresh demo of the idea, built for the Google Cloud AI Builder Cup 2026. <span id="gen"></span>
+  </footer>
+</main>
+<div class="tip" id="tip"></div>
+<script src="/static/charts.js?v=202610181140"></script>
+<script src="/static/results.js?v=202610181140"></script>
+</body>
+</html>

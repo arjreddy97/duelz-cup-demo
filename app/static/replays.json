@@ -1,0 +1,217 @@
+{
+  "model": "gemini-3.8-flash",
+  "runs": [
+    {
+      "task": "django-16877-15916-15563",
+      "project": "django",
+      "bugs": [
+        {
+          "id": "django-16877",
+          "what": "Add a new template filter, escapeseq, that escapes each item in a list"
+        },
+        {
+          "id": "django-15916",
+          "what": "A ModelForm's Meta can't set formfield_callback"
+        },
+        {
+          "id": "django-15563",
+          "what": "queryset.update() changes the wrong rows when a model has two parent models"
+        }
+      ],
+      "failing_start": 8,
+      "duelz": {
+        "wall": 179.0,
+        "cost": 0.4029,
+        "solved": true,
+        "first_check": 6.2,
+        "final_check": 162.2,
+        "branches": [
+          {
+            "start": 41.0,
+            "end": 82.2,
+            "files": [
+              "django/forms/models.py"
+            ],
+            "bug": 1,
+            "cost": 0.0813
+          },
+          {
+            "start": 41.0,
+            "end": 73.8,
+            "files": [
+              "django/template/defaultfilters.py"
+            ],
+            "bug": 0,
+            "cost": 0.0582
+          },
+          {
+            "start": 41.0,
+            "end": 142.1,
+            "files": [
+              "django/db/models/sql/subqueries.py"
+            ],
+            "bug": 2,
+            "cost": 0.2634
+          }
+        ]
+      },
+      "cli": {
+        "wall": 832,
+        "wall_raw": 1053.0,
+        "rate_limit_wait": 221,
+        "cost": 1.7817,
+        "solved": true
+      }
+    },
+    {
+      "task": "sympy-24562-16792-19954-22714",
+      "project": "sympy",
+      "bugs": [
+        {
+          "id": "sympy-24562",
+          "what": "Rational('0.5', '100') gives the wrong value"
+        },
+        {
+          "id": "sympy-16792",
+          "what": "autowrap with Cython breaks when an array argument isn't used in the expression"
+        },
+        {
+          "id": "sympy-19954",
+          "what": "sylow_subgroup() crashes with an IndexError"
+        },
+        {
+          "id": "sympy-22714",
+          "what": "Creating a Point with evaluate(False) wrongly says it has imaginary coordinates"
+        }
+      ],
+      "failing_start": 4,
+      "duelz": {
+        "wall": 231.0,
+        "cost": 0.4905,
+        "solved": true,
+        "first_check": 17.6,
+        "final_check": 205.1,
+        "branches": [
+          {
+            "start": 56.6,
+            "end": 143.1,
+            "files": [
+              "sympy/utilities/codegen.py"
+            ],
+            "bug": 1,
+            "cost": 0.2603
+          },
+          {
+            "start": 56.6,
+            "end": 102.0,
+            "files": [
+              "sympy/core/numbers.py"
+            ],
+            "bug": 0,
+            "cost": 0.092
+          },
+          {
+            "start": 56.6,
+            "end": 103.9,
+            "files": [
+              "sympy/geometry/point.py"
+            ],
+            "bug": 3,
+            "cost": 0.0968
+          },
+          {
+            "start": 56.6,
+            "end": 88.9,
+            "files": [
+              "sympy/combinatorics/perm_groups.py"
+            ],
+            "bug": 2,
+            "cost": 0.0414
+          }
+        ]
+      },
+      "cli": {
+        "wall": 964,
+        "wall_raw": 1203.0,
+        "rate_limit_wait": 239,
+        "cost": 1.8046,
+        "solved": true
+      }
+    },
+    {
+      "task": "scikit-learn-25973-25232-25747-25931",
+      "project": "scikit-learn",
+      "bugs": [
+        {
+          "id": "scikit-learn-25973",
+          "what": "SequentialFeatureSelector won't accept a list of cross-validation splits"
+        },
+        {
+          "id": "scikit-learn-25232",
+          "what": "IterativeImputer has no fill_value option"
+        },
+        {
+          "id": "scikit-learn-25747",
+          "what": "FeatureUnion fails with pandas output when a step changes the number of rows"
+        },
+        {
+          "id": "scikit-learn-25931",
+          "what": "IsolationForest warns about feature names it was fitted with"
+        }
+      ],
+      "failing_start": 4,
+      "duelz": {
+        "wall": 400.0,
+        "cost": 0.8214,
+        "solved": true,
+        "first_check": 22.0,
+        "final_check": 362.1,
+        "branches": [
+          {
+            "start": 61.5,
+            "end": 241.0,
+            "files": [
+              "sklearn/feature_selection/_sequential.py"
+            ],
+            "bug": 0,
+            "cost": 0.301
+          },
+          {
+            "start": 61.5,
+            "end": 164.7,
+            "files": [
+              "sklearn/ensemble/_iforest.py"
+            ],
+            "bug": 3,
+            "cost": 0.1381
+          },
+          {
+            "start": 213.7,
+            "end": 291.9,
+            "files": [
+              "sklearn/utils/_set_output.py"
+            ],
+            "bug": 2,
+            "cost": 0.235
+          },
+          {
+            "start": 216.6,
+            "end": 267.7,
+            "files": [
+              "sklearn/impute/_iterative.py"
+            ],
+            "bug": 1,
+            "cost": 0.1472
+          }
+        ]
+      },
+      "cli": {
+        "wall": 931,
+        "wall_raw": 1218.0,
+        "rate_limit_wait": 287,
+        "cost": 1.8569,
+        "solved": true
+      }
+    }
+  ]
+}

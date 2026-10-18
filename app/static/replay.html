@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duelz Real Runs</title>
+<meta name="description" content="Replays of real benchmark runs: Duelz vs Gemini CLI on the same Gemini model and the same real bugs.">
+<link rel="stylesheet" href="/static/style.css?v=202610181140">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='4' fill='%232a78d6'/><path d='M4 4h3v8H4zM9 4h3v3H9zm0 5h3v3H9z' fill='white'/></svg>">
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="/">Duelz <span>for Gemini</span></a>
+  <nav><a href="/">Results</a><a class="on" href="/replay">Real runs</a><a href="/demo">Live demo</a></nav>
+</div></header>
+
+<main class="wrap">
+  <div class="hero">
+    <h1>Watch a real run.</h1>
+    <p class="lede">Recorded benchmark runs on real bugs from SWE-bench Verified, replayed with their real timings and costs.
+      Both sides used <code>gemini-3.8-flash</code>, and a hidden grader with the original tests decided the result.</p>
+  </div>
+
+  <div class="runbar">
+    <div class="seg" id="pick" role="tablist" aria-label="Task"></div>
+    <label class="status">Speed
+      <select id="speed"><option value="10">10x</option><option value="20" selected>20x</option><option value="40">40x</option></select></label>
+    <button class="btn" id="go">Play</button>
+  </div>
+  <ol class="bugs bugs-lg" id="bugs"></ol>
+
+  <div class="lanes">
+    <div class="lane" id="lane-cli">
+      <h3>Gemini CLI</h3>
+      <p class="desc">Google's agent: one conversation works through every bug.</p>
+      <div class="meter">
+        <div><div class="k">Cost</div><div class="v" data-k="cost">$0.00</div></div>
+        <div><div class="k">Time</div><div class="v" data-k="time">0:00</div></div>
+        <div><div class="k">Bugs</div><div class="v" data-k="bugs">0</div></div>
+      </div>
+      <ul class="tree"></ul>
+      <div class="verdict"></div>
+    </div>
+    <div class="lane" id="lane-duelz">
+      <h3>Duelz</h3>
+      <p class="desc">Splits the failures by cause and fixes each branch in parallel, then verifies the whole suite.</p>
+      <div class="meter">
+        <div><div class="k">Cost</div><div class="v" data-k="cost">$0.00</div></div>
+        <div><div class="k">Time</div><div class="v" data-k="time">0:00</div></div>
+        <div><div class="k">Bugs</div><div class="v" data-k="bugs">0</div></div>
+      </div>
+      <ul class="tree"></ul>
+      <div class="verdict"></div>
+    </div>
+  </div>
+
+  <p class="foot" id="foot"></p>
+  <footer>Replays of recorded runs; nothing is executed. Built for the Google Cloud AI Builder Cup 2026.</footer>
+</main>
+<script src="/static/replay.js?v=202610181140"></script>
+</body>
+</html>

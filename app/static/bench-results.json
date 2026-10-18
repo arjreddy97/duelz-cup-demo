@@ -1,0 +1,319 @@
+{
+  "generated_at": "2026-10-18T15:34Z",
+  "provisional": false,
+  "stopped": true,
+  "gemini": {
+    "title": "Duelz vs Gemini CLI, both on gemini-3.8-flash",
+    "model": "gemini-3.8-flash",
+    "baseline_name": "Gemini CLI",
+    "planned_tasks": 25,
+    "paired_tasks": 11,
+    "pending_tasks": 0,
+    "summary": {
+      "baseline": {
+        "total_cost": 11.639,
+        "mean_cost": 1.0581,
+        "mean_seconds": 596.4,
+        "solved": 11,
+        "n": 11
+      },
+      "duelz": {
+        "total_cost": 3.9253,
+        "mean_cost": 0.3568,
+        "mean_seconds": 205.3,
+        "solved": 11,
+        "n": 11
+      },
+      "cheaper_x": 2.97,
+      "faster_x": 2.91
+    },
+    "tasks": [
+      {
+        "task": "django-17029-15731-16569-16899",
+        "baseline": {
+          "cost": 0.5055,
+          "seconds": 251,
+          "seconds_raw": 285.0,
+          "solved": true
+        },
+        "duelz": {
+          "cost": 0.1312,
+          "seconds": 166.0,
+          "solved": true
+        }
+      },
+      {
+        "task": "django-16950-15851-16493",
+        "baseline": {
+          "cost": 0.8543,
+          "seconds": 564,
+          "seconds_raw": 598.0,
+          "solved": true
+        },
+        "duelz": {
+          "cost": 0.2806,
+          "seconds": 212.0,
+          "solved": true
+        }
+      },
+      {
+        "task": "pytest-10356-10051",
+        "baseline": {
+          "cost": 0.9629,
+          "seconds": 575,
+          "seconds_raw": 657.0,
+          "solved": true
+        },
+        "duelz": {
+          "cost": 0.4466,
+          "seconds": 193.0,
+          "solved": true
+        }
+      },
+      {
+        "task": "django-16901-15315-16595",
+        "baseline": {
+          "cost": 0.5479,
+          "seconds": 390,
+          "seconds_raw": 499.0,
+          "solved": true
+        },
+        "duelz": {
+          "cost": 0.25,
+          "seconds": 331.0,
+          "solved": true
+        }
+      },
+      {
+        "task": "scikit-learn-25973-25232-25747-25931",
+        "baseline": {
+          "cost": 1.8569,
+          "seconds": 931,
+          "seconds_raw": 1218.0,
+          "solved": true
+        },
+        "duelz": {
+          "cost": 0.8214,
+          "seconds": 400.0,
+          "solved": true
+        }
+      },
+      {
+        "task": "sympy-24562-16792-19954-22714",
+        "baseline": {
+          "cost": 1.8046,
+          "seconds": 964,
+          "seconds_raw": 1203.0,
+          "solved": true
+        },
+        "duelz": {
+          "cost": 0.4905,
+          "seconds": 231.0,
+          "solved": true
+        }
+      },
+      {
+        "task": "django-16877-15916-15563",
+        "baseline": {
+          "cost": 1.7817,
+          "seconds": 832,
+          "seconds_raw": 1053.0,
+          "solved": true
+        },
+        "duelz": {
+          "cost": 0.4029,
+          "seconds": 179.0,
+          "solved": true
+        }
+      },
+      {
+        "task": "django-16662-16429-16100-15525",
+        "baseline": {
+          "cost": 0.9441,
+          "seconds": 507,
+          "seconds_raw": 657.0,
+          "solved": true
+        },
+        "duelz": {
+          "cost": 0.4635,
+          "seconds": 151.0,
+          "solved": true
+        }
+      },
+      {
+        "task": "django-16801-15732-15467",
+        "baseline": {
+          "cost": 1.065,
+          "seconds": 765,
+          "seconds_raw": 879.0,
+          "solved": true
+        },
+        "duelz": {
+          "cost": 0.3158,
+          "seconds": 198.0,
+          "solved": true
+        }
+      },
+      {
+        "task": "sympy-23534-22914",
+        "baseline": {
+          "cost": 0.6258,
+          "seconds": 390,
+          "seconds_raw": 543.0,
+          "solved": true
+        },
+        "duelz": {
+          "cost": 0.0561,
+          "seconds": 68.0,
+          "solved": true
+        }
+      },
+      {
+        "task": "cantools-eeet-g26l-za8x",
+        "baseline": {
+          "cost": 0.6903,
+          "seconds": 391,
+          "seconds_raw": 584.0,
+          "solved": true
+        },
+        "duelz": {
+          "cost": 0.2667,
+          "seconds": 129.0,
+          "solved": true
+        }
+      }
+    ],
+    "excluded": [
+      {
+        "task": "sympy-24539-24213-19637-20590",
+        "reason": "Duelz run crashed after 1s (infrastructure, never started)"
+      }
+    ],
+    "note": "Multi-bug coding tasks (several real upstream bugs stacked in one repo). One run per task per side. Cost is model spend. Gemini CLI times exclude its rate-limit retry waits (Google's per-minute token quota); Duelz logged none."
+  },
+  "real_runs": [
+    {
+      "task": "django-16877-15916-15563",
+      "project": "django",
+      "bugs": [
+        {
+          "id": "django-16877",
+          "what": "Add a new template filter, escapeseq, that escapes each item in a list"
+        },
+        {
+          "id": "django-15916",
+          "what": "A ModelForm's Meta can't set formfield_callback"
+        },
+        {
+          "id": "django-15563",
+          "what": "queryset.update() changes the wrong rows when a model has two parent models"
+        }
+      ],
+      "branches": 3,
+      "baseline": {
+        "cost": 1.7817,
+        "seconds": 832,
+        "solved": true
+      },
+      "duelz": {
+        "cost": 0.4029,
+        "seconds": 179.0,
+        "solved": true
+      }
+    },
+    {
+      "task": "sympy-24562-16792-19954-22714",
+      "project": "sympy",
+      "bugs": [
+        {
+          "id": "sympy-24562",
+          "what": "Rational('0.5', '100') gives the wrong value"
+        },
+        {
+          "id": "sympy-16792",
+          "what": "autowrap with Cython breaks when an array argument isn't used in the expression"
+        },
+        {
+          "id": "sympy-19954",
+          "what": "sylow_subgroup() crashes with an IndexError"
+        },
+        {
+          "id": "sympy-22714",
+          "what": "Creating a Point with evaluate(False) wrongly says it has imaginary coordinates"
+        }
+      ],
+      "branches": 4,
+      "baseline": {
+        "cost": 1.8046,
+        "seconds": 964,
+        "solved": true
+      },
+      "duelz": {
+        "cost": 0.4905,
+        "seconds": 231.0,
+        "solved": true
+      }
+    },
+    {
+      "task": "scikit-learn-25973-25232-25747-25931",
+      "project": "scikit-learn",
+      "bugs": [
+        {
+          "id": "scikit-learn-25973",
+          "what": "SequentialFeatureSelector won't accept a list of cross-validation splits"
+        },
+        {
+          "id": "scikit-learn-25232",
+          "what": "IterativeImputer has no fill_value option"
+        },
+        {
+          "id": "scikit-learn-25747",
+          "what": "FeatureUnion fails with pandas output when a step changes the number of rows"
+        },
+        {
+          "id": "scikit-learn-25931",
+          "what": "IsolationForest warns about feature names it was fitted with"
+        }
+      ],
+      "branches": 4,
+      "baseline": {
+        "cost": 1.8569,
+        "seconds": 931,
+        "solved": true
+      },
+      "duelz": {
+        "cost": 0.8214,
+        "seconds": 400.0,
+        "solved": true
+      }
+    }
+  ],
+  "claude_code": {
+    "title": "Duelz vs Claude Code (Haiku 5.5, low effort)",
+    "tasks": 25,
+    "model_cost_ratio": "0.55-0.64x",
+    "solved": {
+      "duelz_pct": 100,
+      "claude_code_pct": 92
+    },
+    "time_ratio": 0.95,
+    "runs": {
+      "duelz": 50,
+      "claude_code": 25
+    },
+    "source": "25 multi-bug tasks, Haiku 5.5 on both sides, same hidden grader. Duelz 2 runs per task, Claude Code 1 run per task. Model-cost range is over repeat runs."
+  },
+  "babel": {
+    "title": "Whole-library build: babel, 5,663 tests",
+    "tests": 5663,
+    "duelz": {
+      "failing": 0,
+      "cost": 0.46
+    },
+    "claude_code": {
+      "failing": 2,
+      "cost": 0.86
+    },
+    "source": "One build run per side, Haiku 5.5, model cost."
+  }
+}
