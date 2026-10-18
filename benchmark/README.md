@@ -45,6 +45,14 @@ instances' hidden tests) is applied, and the `check` command is run. A task coun
   ($0.75 per million input, $3.75 per million output, $0.075 per million cached input tokens).
 - **Duelz:** the private engine, on the same model. Only its aggregate cost, time and result are published.
 
+## Caching
+
+Duelz ran almost uncached: only 0.4% of its 4.8M input tokens were cache hits. Gemini CLI got 94–96% cache hits on the
+same model, and its costs above are already priced at the cached rate ($0.075 instead of $0.75 per million input
+tokens). Duelz's calls average about 9K tokens, above Gemini's caching minimum, so they are cacheable. With caching at
+Gemini CLI's level, we estimate Duelz at about 0.07–0.18x Gemini CLI's cost instead of 0.34x
+(50% hits: about $2.14; 70%: about $1.49; 90%: about $0.85, against $11.64). This is an estimate, not a measured run.
+
 ## What is excluded or adjusted
 
 - **Gemini CLI rate-limit waits are removed from its time.** It hit Google's per-minute input-token quota and waited

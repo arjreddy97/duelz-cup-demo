@@ -129,7 +129,9 @@
       tile("Green", `${b.green ? "✓" : "✗"} / ${a.green ? "✓" : "✗"}`, `split / single · ${b.calls} vs ${a.calls} turns`);
     $("cmp-foot").textContent = "One run, so expect noise. " +
       "The single agent's prompt grows every turn because it re-sends the whole conversation; split branches stay short " +
-      "and run at the same time. Gemini's implicit cache, when it hits, makes re-sent tokens cheaper and narrows the cost gap.";
+      "and run at the same time. Neither side gets cache hits here. If Gemini's cache did hit, it would mostly discount " +
+      "the single agent's re-sent conversation and narrow this gap. In the real benchmark it was the other way round: " +
+      "Gemini CLI was 94–96% cached and Duelz almost uncached (0.4%), and Duelz still cost 0.34x.";
     $("compare").hidden = false;
   }
 

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Duelz for Gemini</title>
 <meta name="description" content="Split, fix, verify: a smarter harness makes the same Gemini model cheaper and faster than one big agent.">
-<link rel="stylesheet" href="/static/style.css?v=202610181930">
+<link rel="stylesheet" href="/static/style.css?v=202610182000">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='4' fill='%232a78d6'/><path d='M4 4h3v8H4zM9 4h3v3H9zm0 5h3v3H9z' fill='white'/></svg>">
 </head>
 <body>
@@ -51,6 +51,9 @@
     </div>
     <details><summary>Per-task table</summary><div class="tbl-wrap"><table id="gem-table"></table></div></details>
     <p class="foot" id="gem-foot"></p>
+    <p class="callout"><b>Duelz ran almost uncached.</b> Only 0.4% of its input tokens were cache hits, against 94–96% for
+      Gemini CLI, whose costs above are already priced at the cheaper cached rate. With caching at Gemini CLI's level, we
+      estimate Duelz at about <b>0.07–0.18x</b> Gemini CLI's cost instead of 0.34x. This is an estimate, not a measured run.</p>
   </section>
 
   <section class="card" id="real">
@@ -90,7 +93,7 @@
   </footer>
 </main>
 <div class="tip" id="tip"></div>
-<script src="/static/charts.js?v=202610181930"></script>
-<script src="/static/results.js?v=202610181930"></script>
+<script src="/static/charts.js?v=202610182000"></script>
+<script src="/static/results.js?v=202610182000"></script>
 </body>
 </html>

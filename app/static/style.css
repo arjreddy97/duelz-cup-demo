@@ -180,3 +180,5 @@ nav a { white-space: nowrap; }
 .histtable td.empty { text-align: left; color: var(--muted); white-space: normal; }
 .histtable td:last-child, .histtable th:last-child { text-align: center; }
 @media (max-width: 520px) { .histtable th, .histtable td { padding: 6px 5px; font-size: 12.5px; white-space: normal; } }
+.callout { margin: 14px 0 0; padding: 12px 14px; border-left: 3px solid var(--accent); background: var(--surface-2);
+  border-radius: 0 8px 8px 0; font-size: 14.5px; color: var(--text); }
