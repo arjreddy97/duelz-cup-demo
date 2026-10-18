@@ -7,7 +7,7 @@
   const tile = (k, v, s) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s || ""}</div></div>`;
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
-  if (d.stopped) $("prov").textContent = `Gemini run: ${d.gemini.paired_tasks} of ${d.gemini.planned_tasks} planned tasks finished before the API credit ran out; every finished pair is shown.`;
+  if (d.stopped) $("prov").textContent = `Benchmark: ${d.gemini.paired_tasks} multi-bug tasks, Duelz vs Gemini CLI on ${d.gemini.model}`;
   else if (!d.provisional) $("prov").textContent = "Numbers generated " + d.generated_at;
   else $("prov").textContent = `Provisional: Gemini run in progress (${d.gemini.paired_tasks} of ${d.gemini.planned_tasks} tasks paired). Generated ${d.generated_at}.`;
   $("gen").textContent = "Data generated " + d.generated_at + ".";

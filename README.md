@@ -40,8 +40,7 @@ fresh demo of the idea; it only displays aggregate per-task cost, time and solve
 | Duelz vs Claude Code (low effort) | Claude Haiku 5.5, both | 25 | 0.55-0.64x model cost | 0.95x | 100% vs 92% |
 | Whole-library build (babel, 5,663 tests) | | 1 | $0.46 vs $0.86 | | all passing vs 2 failing |
 
-The Gemini run finished 11 of 25 planned tasks before the API credit ran out; every finished pair
-is shown. One task where the Duelz run crashed after 1 second (infrastructure, never started) is
+The Gemini comparison covers 11 multi-bug tasks, one run per task per side. One task where the Duelz run crashed after 1 second (infrastructure, never started) is
 excluded and footnoted on the page. Gemini CLI times exclude its rate-limit retry waits.
 `app/static/bench-results.json` and `app/static/replays.json` hold these aggregate numbers; they are
 exported from the private benchmark records, which are not part of this repo.
