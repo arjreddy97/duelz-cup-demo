@@ -133,6 +133,45 @@
     $("compare").hidden = false;
   }
 
+  // Recent live runs, stored in Firestore by the server (GET /api/runs).
+  const ago = (t) => {
+    if (!t) return "just now";
+    const s = Math.max(0, Date.now() / 1000 - t);
+    if (s < 60) return "just now";
+    if (s < 3600) return Math.round(s / 60) + " min ago";
+    if (s < 86400) return Math.round(s / 3600) + " h ago";
+    return Math.round(s / 86400) + " d ago";
+  };
+  const modeCell = (m) => m && !m.error && m.cost_usd != null
+    ? `${usd(m.cost_usd)} · ${(+m.wall_seconds).toFixed(0)}s` : "error";
+  function loadRuns() {
+    fetch("/api/runs").then((r) => r.json()).then((d) => {
+      const body = $("hist-rows");
+      body.innerHTML = "";
+      const runs = d.runs || [];
+      if (!runs.length) {
+        const tr = body.insertRow(), td = tr.insertCell();
+        td.colSpan = 5; td.className = "empty";
+        td.textContent = d.stored === false ? "Run history is not stored on this server (local or test mode)."
+          : "No stored runs yet. Press “Run both modes” to add one.";
+      }
+      for (const r of runs) {
+        const tr = body.insertRow();
+        const ok = r.both_green;
+        [ago(r.created), modeCell(r.single), modeCell(r.split), r.cost_label, ok ? "✓" : "✗"].forEach((v, i) => {
+          const td = tr.insertCell(); td.textContent = v;
+          if (i === 4) td.className = ok ? "ok" : "no";
+        });
+      }
+      const a = d.aggregate || {};
+      $("hist-agg").textContent = a.count
+        ? `Last ${a.count} stored run(s): median split cost ${a.median_cost_label} vs single; split was cheaper in ` +
+          `${a.split_cheaper} of ${a.compared}; both modes green in ${a.both_green} of ${a.count}.`
+        : "";
+    }).catch(() => { $("hist-rows").innerHTML = '<tr><td colspan="5" class="empty">Run history unavailable.</td></tr>'; });
+  }
+  loadRuns();
+
   $("go").addEventListener("click", async () => {
     $("go").disabled = true;
     $("status").textContent = "Starting…";
@@ -176,6 +215,8 @@
       $("status").firstChild.textContent = "Connection lost: " + e.message;
     } finally {
       clearInterval(timer);
+      // The server stores the run in the background; give the write a moment, then refresh the table.
+      setTimeout(loadRuns, 2500); setTimeout(loadRuns, 10000);
       setTimeout(() => { $("go").disabled = false; }, 60000);
     }
   });

@@ -9,7 +9,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import config
+from . import config, runstore
 from .modes import single_agent, split_verify
 
 STATIC = Path(__file__).resolve().parent / "static"
@@ -110,6 +110,15 @@ def public_config():
             "live": bool(config.LIVE_ENABLED and (config.api_key() or config.FAKE_MODEL))}
 
 
+@app.get("/api/runs")
+async def recent_runs():
+    """Last 10 stored live runs (newest first) + aggregates over the last 50."""
+    try:
+        return await asyncio.wait_for(asyncio.to_thread(runstore.recent_summary), timeout=8)
+    except Exception:
+        return {"runs": [], "aggregate": runstore.aggregate([]), "stored": runstore.enabled()}
+
+
 @app.post("/api/run")
 async def run(request: Request):
     who = visitor_id(request)
@@ -131,7 +140,10 @@ async def run(request: Request):
 
     async def driver():
         try:
-            await asyncio.gather(guarded(single_agent, "single"), guarded(split_verify, "split"))
+            single, split = await asyncio.gather(guarded(single_agent, "single"),
+                                                 guarded(split_verify, "split"))
+            # Both modes done or errored: store the outcome (background thread, never raises).
+            runstore.save_run_async(runstore.build_record(config.MODEL, single, split))
         finally:
             limiter.finish()
             queue.put_nowait({"kind": "end"})

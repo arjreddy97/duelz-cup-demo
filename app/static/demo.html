@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Duelz Live Demo</title>
 <meta name="description" content="One Gemini coding agent versus split-and-verify, live, on a small Python project with six bugs in six files.">
-<link rel="stylesheet" href="/static/style.css?v=202610181140">
+<link rel="stylesheet" href="/static/style.css?v=202610181900">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='4' fill='%232a78d6'/><path d='M4 4h3v8H4zM9 4h3v3H9zm0 5h3v3H9z' fill='white'/></svg>">
 </head>
 <body>
@@ -77,6 +77,17 @@
     <p class="foot" id="cmp-foot"></p>
   </section>
 
+  <section class="card" id="history">
+    <h2>Recent live runs <span class="h2-note">(stored in Firestore)</span></h2>
+    <p class="sub">Every finished live run on this page is saved to Google Cloud Firestore: outcome, cost,
+      time and tokens per mode. Nothing about visitors is stored.</p>
+    <div class="tbl-wrap"><table class="histtable">
+      <thead><tr><th>When</th><th>Single agent</th><th>Split &amp; verify</th><th>Split cost vs single</th><th>Both green</th></tr></thead>
+      <tbody id="hist-rows"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody>
+    </table></div>
+    <p class="foot" id="hist-agg"></p>
+  </section>
+
   <section class="card">
     <h2>What is being measured</h2>
     <p class="sub">Tokens come from Gemini's <code>usageMetadata</code> on every call. Dollars use Google's published
@@ -92,8 +103,8 @@
       inside it, tests are read-only, and nothing you type is executed. This demo is deliberately simple and generic;
       the benchmark results on the <a href="/">results page</a> come from Duelz's full engine.</p>
   </section>
-  <footer>Built for the Google Cloud AI Builder Cup 2026. One live run per visitor per minute.</footer>
+  <footer>Built for the Google Cloud AI Builder Cup 2026. Runs on Cloud Run with Gemini; live-run results are stored in Firestore. One live run per visitor per minute.</footer>
 </main>
-<script src="/static/demo.js?v=202610181140"></script>
+<script src="/static/demo.js?v=202610181900"></script>
 </body>
 </html>

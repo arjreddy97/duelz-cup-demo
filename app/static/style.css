@@ -176,3 +176,7 @@ nav a { white-space: nowrap; }
 .bugtable td:first-child { white-space: nowrap; }
 #bugs-card { margin-bottom: 16px; }
 .tile .v small { font-size: 15px; font-weight: 600; color: var(--text-2); margin-left: 4px; }
+.h2-note { font-size: 14px; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+.histtable td.empty { text-align: left; color: var(--muted); white-space: normal; }
+.histtable td:last-child, .histtable th:last-child { text-align: center; }
+@media (max-width: 520px) { .histtable th, .histtable td { padding: 6px 5px; font-size: 12.5px; white-space: normal; } }

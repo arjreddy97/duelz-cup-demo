@@ -98,6 +98,20 @@ attempt (exercises the retry), `DEMO_FAKE_LATENCY=0.4` sets seconds per call. `d
 - Rate limits: one live run per visitor per minute, at most 2 concurrent runs, 10 per hour and
   40 per day (all configurable). Limits are in memory, so the deploy pins one instance.
 
+## Live-run history (Firestore)
+
+Every finished live run is saved as one document in the Firestore collection `live_runs`
+(default database, Native mode, us-central1): a server timestamp (`created`), the model name, and
+for each mode (`single`, `split`) `green`, `passed`, `total`, `cost_usd`, `wall_seconds`,
+`input_tokens`, `output_tokens`, `cached_tokens`, `turns`, `max_prompt_tokens` and `stop` (or
+`{"error": true}` if that mode errored). Nothing about visitors is stored: no IP, no visitor id.
+Writes run on a background thread with a 5 s timeout and never affect a run. `GET /api/runs`
+returns the last 10 runs plus aggregates over the last 50 (median split/single cost ratio, how often
+split was cheaper, how often both were green), cached for 20 s; the demo page shows them under
+"Recent live runs". Firestore is used only on Cloud Run (or with `DEMO_FIRESTORE=1`), never with
+`DEMO_FAKE_MODEL=1`; locally it is off and `/api/runs` returns an empty list. The Cloud Run
+service account needs `roles/datastore.user`.
+
 ## Deploy (Cloud Run)
 
 ```bash
@@ -114,7 +128,8 @@ with `--allow-unauthenticated`, one max instance, and `GEMINI_API_KEY` mounted f
 ## Layout
 
 ```
-app/main.py            FastAPI app: pages, /api/run (streams events), rate limits
+app/main.py            FastAPI app: pages, /api/run (streams events), /api/runs, rate limits
+app/runstore.py        live-run results in Firestore (background writes, cached reads, aggregates)
 app/agent.py           the shared agent loop and its tools (path and write restrictions live here)
 app/modes.py           the two demo modes: single agent, split & verify
 app/gemini.py          google-genai wrapper with token/dollar metering (fake model when DEMO_FAKE_MODEL=1)
