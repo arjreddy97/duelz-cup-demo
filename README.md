@@ -6,10 +6,12 @@ A demo for the Google Cloud AI Builder Cup 2026. It shows that a smarter harness
 same Gemini model fixes multi-bug coding tasks for less money and in less time than one big
 agent working through everything in a single conversation.
 
-The site has two pages:
+The site has three pages:
 
 - **Results** (`/`): benchmark charts and tables. Duelz vs Google's Gemini CLI on the same model,
   Duelz vs Claude Code, and a whole-library build.
+- **Real runs** (`/replay`): replays of recorded benchmark runs of Duelz vs Gemini CLI (both on
+  gemini-3.8-flash, real SWE-bench Verified bugs) with their real timings and costs. Nothing is executed.
 - **Live demo** (`/demo`): both approaches run side by side as live Gemini coding agents on a
   small bundled Python project with six bugs in six files (22 failing tests, 21 passing).
 
@@ -140,7 +142,7 @@ app/modes.py           the two demo modes: single agent, split & verify
 app/gemini.py          google-genai wrapper with token/dollar metering (fake model when DEMO_FAKE_MODEL=1)
 app/sandbox.py         temp-copy workspaces, pytest runner, traceback grouping
 app/pytest_plugin/     tiny pytest plugin that reports outcomes + traceback files as JSON
-app/static/            results page, demo page, charts, bench-results.json
+app/static/            results, real-runs and demo pages, charts, bench-results.json, replays.json (replay data)
 sample_project/        invoicer: 7 small modules, 43 tests, 6 deliberate bugs in 6 files (22 failing)
 devtools/              dev-only: scripted fake model + reference fixes (not shipped)
 tests/                 app tests (run with the fake model; no API calls)
