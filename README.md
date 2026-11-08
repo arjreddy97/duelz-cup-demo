@@ -88,6 +88,10 @@ attempt (exercises the retry), `DEMO_FAKE_LATENCY=0.4` sets seconds per call. `d
   output is cut at 4,000 characters. Every agent starts with the files in its scope (whole project
   for the single agent, its own source and test file for a branch; `DEMO_PRELOAD_FILES=0` turns
   this off for both).
+- Stop at green, the same rule for both modes (`DEMO_STOP_AT_GREEN=1`, the default): after every
+  successful edit the harness runs the agent's own tests (a branch's tests, or the whole suite for
+  the single agent) and ends the agent as soon as they pass; otherwise the test output comes back
+  with the edit. Agents are told they don't need to run the tests before their first edit.
 - Single agent: up to 30 turns. Split & verify: one loop per failure group, in parallel, up to 12
   turns each; a branch may only write its own file, sees only its group's failures, and its
   `run_tests` only runs its tests. Then merge, full suite, and one fresh 8-turn retry per still-red group.
@@ -115,7 +119,9 @@ for each mode (`single`, `split`) `green`, `passed`, `total`, `cost_usd`, `wall_
 Writes run on a background thread with a 5 s timeout and never affect a run. `GET /api/runs`
 returns the last 10 runs plus aggregates over the last 50 (median split/single cost ratio, how often
 split was cheaper, how often both were green), cached for 20 s; the demo page shows them under
-"Recent live runs". Firestore is used only on Cloud Run (or with `DEMO_FIRESTORE=1`), never with
+"Recent live runs". Reads make one attempt with a 5 s timeout, one at a time, starting when the
+instance starts; a failed read keeps the last good one, and until there is one the API answers
+`"ok": false` and the page shows "Loading run history…" and asks again. Firestore is used only on Cloud Run (or with `DEMO_FIRESTORE=1`), never with
 `DEMO_FAKE_MODEL=1`; locally it is off and `/api/runs` returns an empty list. The Cloud Run
 service account needs `roles/datastore.user`.
 

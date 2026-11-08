@@ -56,9 +56,11 @@ async def single_agent(emit, model=None):
         files = None
         if config.PRELOAD_FILES:
             files = {rel: sandbox.read(ws, rel) for rel in sandbox.source_files(ws) + sandbox.test_files(ws)}
-        task = build_task(first["failures"], editable=None, scoped=False, files=files)
+        task = build_task(first["failures"], editable=None, scoped=False, files=files,
+                          stop_at_green=config.STOP_AT_GREEN)
         res = await run_loop(model, task, tools, meter, max_turns, config.MODE_MAX_USD,
-                             _turn_reporter(emit, mode, "agent", max_turns, meter))
+                             _turn_reporter(emit, mode, "agent", max_turns, meter),
+                             stop_at_green=config.STOP_AT_GREEN)
         result = await sandbox.run_pytest(ws)
         green = result["failed"] == 0
         emit({"mode": mode, "kind": "node", "id": "agent", "parent": "root",
@@ -100,9 +102,10 @@ async def split_verify(emit, model=None):
             tests = sorted({n.split("::")[0] for n in scope})
             files = {rel: sandbox.read(pws, rel) for rel in [*writable, *tests] if (pws / rel).is_file()}
         task = build_task(failures, editable=writable if owner else None, scoped=True, retry=retry,
-                          files=files)
+                          files=files, stop_at_green=config.STOP_AT_GREEN)
         res = await run_loop(model, task, tools, meter, max_turns, config.MODE_MAX_USD,
-                             _turn_reporter(emit, mode, nid, max_turns, meter))
+                             _turn_reporter(emit, mode, nid, max_turns, meter),
+                             stop_at_green=config.STOP_AT_GREEN)
         stops.append(res.stop)
         # The harness checks the branch itself; the model's "finish" is not trusted.
         check = await sandbox.run_pytest(pws, scope or None)

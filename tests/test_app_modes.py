@@ -8,6 +8,12 @@ from app import config, main, modes
 from devtools.fake_model import FakeModel
 
 
+@pytest.fixture(autouse=True)
+def classic_loop(monkeypatch):
+    """These tests describe the loop without the stop-at-green rule; that rule has its own test."""
+    monkeypatch.setattr(config, "STOP_AT_GREEN", False)
+
+
 def run_mode(fn, model):
     events = []
     summary = asyncio.run(fn(events.append, model))
@@ -123,3 +129,14 @@ def test_api_refuses_without_key_or_fake(client, monkeypatch):
     r = client.post("/api/run")
     assert r.status_code == 429 and "not configured" in r.json()["error"]
     assert client.get("/api/config").json()["live"] is False
+
+
+@pytest.mark.parametrize("fn", [modes.single_agent, modes.split_verify])
+def test_stop_at_green_ends_agents_after_the_fixing_edit(monkeypatch, fn):
+    base, base_events = run_mode(fn, FakeModel(latency=0))
+    monkeypatch.setattr(config, "STOP_AT_GREEN", True)
+    summary, events = run_mode(fn, FakeModel(latency=0))
+    assert summary["green"] and summary["passed"] == 43
+    assert summary["calls"] < base["calls"]
+    actions = [t["action"] for t in turns_of(events)]
+    assert "finish" not in actions

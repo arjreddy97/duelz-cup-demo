@@ -18,6 +18,10 @@ SPLIT_RETRY_TURNS = int(os.environ.get("DEMO_SPLIT_RETRY_TURNS", "8"))  # per st
 # Hand each agent the files in its scope up front (whole project for the single agent,
 # its own source file + test file for a split branch). Same rule for both modes.
 PRELOAD_FILES = os.environ.get("DEMO_PRELOAD_FILES", "1") == "1"
+# Same rule for both modes: after every edit the harness runs the agent's own tests (a branch's
+# scope, or the whole suite for the single agent) and ends the agent as soon as they pass, so it
+# needs no "run the tests" and "finish" turns of its own. DEMO_STOP_AT_GREEN=0 turns it off.
+STOP_AT_GREEN = os.environ.get("DEMO_STOP_AT_GREEN", "1") == "1"
 TOOL_OUTPUT_CHARS = int(os.environ.get("DEMO_TOOL_OUTPUT_CHARS", "4000"))
 MAX_OUTPUT_TOKENS = int(os.environ.get("DEMO_MAX_OUTPUT_TOKENS", "4096"))
 CALL_TIMEOUT_SECONDS = float(os.environ.get("DEMO_CALL_TIMEOUT", "90"))

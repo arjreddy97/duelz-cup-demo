@@ -14,6 +14,7 @@
     $("split-turns").textContent = c.split_max_turns;
     $("cap").textContent = "$" + c.mode_max_usd.toFixed(2);
     $("outcap").textContent = c.tool_output_chars.toLocaleString("en-US");
+    $("stop-rule").hidden = !c.stop_at_green;
     const p = c.prices_per_million;
     $("prices").textContent = `$${p.input} per million input tokens, $${p.output} per million output tokens (thinking included), $${p.cached} per million cached tokens`;
     if (!c.live) { $("go").disabled = true; $("status").textContent = "Live runs are not enabled on this server."; }
@@ -127,11 +128,17 @@
       tile("Split largest prompt vs single", ratio(a.max_prompt_tokens, b.max_prompt_tokens, "smaller", "larger"),
         `split ${fmtTok(b.max_prompt_tokens)} vs single ${fmtTok(a.max_prompt_tokens)} tokens in one turn`) +
       tile("Green", `${b.green ? "✓" : "✗"} / ${a.green ? "✓" : "✗"}`, `split / single · ${b.calls} vs ${a.calls} turns`);
+    // Share of each side's input that Gemini's cache served, from this run's own counts.
+    const cachedShare = (e) => { const t = e.input_tokens + e.cached_tokens; return t ? e.cached_tokens / t : 0; };
+    const ca = cachedShare(a), cb = cachedShare(b), pct = (x) => Math.round(x * 100) + "%";
+    const cacheNote = ca < 0.01 && cb < 0.01 ? "Neither side got cache hits on this run. "
+      : `Gemini's cache served ${pct(ca)} of the single agent's input and ${pct(cb)} of split's, at a tenth of the input price. `;
     $("cmp-foot").textContent = "One run, so expect noise. " +
       "The single agent's prompt grows every turn because it re-sends the whole conversation; split branches stay short " +
-      "and run at the same time. Neither side gets cache hits here. If Gemini's cache did hit, it would mostly discount " +
-      "the single agent's re-sent conversation and narrow this gap. In the real benchmark it was the other way round: " +
-      "Gemini CLI was 94–96% cached and Duelz almost uncached (0.4%), and Duelz still cost 0.34x.";
+      "and run at the same time. " + cacheNote +
+      "Gemini caches only prompts of 4,096 tokens or more, which the single agent's long conversation reaches and split's " +
+      "short branches rarely do, so cache hits mostly lower the single agent's cost. In the real benchmark the cache favoured the single agent " +
+      "even more (Gemini CLI 94–96% cached, Duelz 0.4%), and Duelz still cost 0.34x.";
     $("compare").hidden = false;
   }
 
@@ -146,8 +153,23 @@
   };
   const modeCell = (m) => m && !m.error && m.cost_usd != null
     ? `${usd(m.cost_usd)} · ${(+m.wall_seconds).toFixed(0)}s` : "error";
+  const histNote = (text) => { $("hist-rows").innerHTML = '<tr><td colspan="5" class="empty"></td></tr>';
+    $("hist-rows").querySelector("td").textContent = text; };
+  let histTries = 0, histTimer = null;
+  // A cold server can need a few seconds for its first Firestore read; it answers ok:false meanwhile.
+  // One pending retry at a time, so overlapping loads don't use up the tries together.
+  const retryRuns = () => {
+    clearTimeout(histTimer);
+    if (++histTries > 6) { histNote("Run history unavailable right now."); return; }
+    histNote("Loading run history…");
+    histTimer = setTimeout(loadRuns, 4000);
+  };
+  const freshRuns = () => { histTries = 0; loadRuns(); };
   function loadRuns() {
     fetch("/api/runs").then((r) => r.json()).then((d) => {
+      if (d.ok === false) { retryRuns(); return; }
+      clearTimeout(histTimer);
+      histTries = 0;
       const body = $("hist-rows");
       body.innerHTML = "";
       const runs = d.runs || [];
@@ -170,7 +192,7 @@
         ? `Last ${a.count} stored run(s): median split cost ${a.median_cost_label} vs single; split was cheaper in ` +
           `${a.split_cheaper} of ${a.compared}; both modes green in ${a.both_green} of ${a.count}.`
         : "";
-    }).catch(() => { $("hist-rows").innerHTML = '<tr><td colspan="5" class="empty">Run history unavailable.</td></tr>'; });
+    }).catch(retryRuns);
   }
   loadRuns();
 
@@ -218,7 +240,7 @@
     } finally {
       clearInterval(timer);
       // The server stores the run in the background; give the write a moment, then refresh the table.
-      setTimeout(loadRuns, 2500); setTimeout(loadRuns, 10000);
+      setTimeout(freshRuns, 2500); setTimeout(freshRuns, 10000);
       setTimeout(() => { $("go").disabled = false; }, 60000);
     }
   });

@@ -64,3 +64,92 @@ def test_api_runs_empty_without_firestore(monkeypatch):
     assert r.status_code == 200
     body = r.json()
     assert body["runs"] == [] and body["aggregate"]["count"] == 0 and body["stored"] is False
+
+
+def test_failed_read_keeps_last_good_and_never_says_empty(monkeypatch):
+    monkeypatch.setenv("DEMO_FIRESTORE", "1")
+    monkeypatch.setattr(config, "FAKE_MODEL", False)
+    monkeypatch.setattr(runstore, "_cache", {"at": 0.0, "data": None})
+    good = [runstore.build_record("m", done(0.10), done(0.05))]
+    calls = []
+
+    def fetch(limit):
+        calls.append(limit)
+        if len(calls) == 1:
+            raise TimeoutError("cold instance")
+        if len(calls) == 2:
+            return good
+        raise TimeoutError("again")
+
+    monkeypatch.setattr(runstore, "_fetch", fetch)
+    first = runstore.recent_summary()
+    assert first["ok"] is False and first["runs"] == []        # page shows "loading", not "no runs"
+    assert runstore._cache["data"] is None                      # the failure is not cached
+    second = runstore.recent_summary()
+    assert second["ok"] is True and len(second["runs"]) == 1
+    monkeypatch.setitem(runstore._cache, "at", 0.0)             # cache expired
+    assert runstore.recent_summary() is second                  # failed refresh: last good read
+
+
+def test_busy_read_gives_up_after_the_wait(monkeypatch):
+    monkeypatch.setattr(runstore, "BUSY_WAIT_SECONDS", 0.05)
+    monkeypatch.setattr(runstore, "_cache", {"at": 0.0, "data": None})
+    monkeypatch.setattr(runstore, "_fetch", lambda limit: (_ for _ in ()).throw(AssertionError("no second read")))
+    assert runstore._reading.acquire(blocking=False)
+    try:
+        assert runstore.recent_summary()["ok"] is False
+    finally:
+        runstore._reading.release()
+
+
+def test_no_client_while_enabled_is_a_failure(monkeypatch):
+    monkeypatch.setenv("DEMO_FIRESTORE", "1")
+    monkeypatch.setattr(config, "FAKE_MODEL", False)
+    monkeypatch.setattr(runstore, "_cache", {"at": 0.0, "data": None})
+    monkeypatch.setattr(runstore, "_get_client", lambda: None)
+    out = runstore.recent_summary()
+    assert out["ok"] is False and out["stored"] is True
+
+
+def test_query_makes_one_attempt(monkeypatch):
+    seen = {}
+
+    class Query:
+        def order_by(self, *a, **k):
+            return self
+
+        def limit(self, n):
+            return self
+
+        def stream(self, **kw):
+            seen.update(kw)
+            return iter(())
+
+    class Client:
+        def collection(self, name):
+            return Query()
+
+    monkeypatch.setattr(runstore, "_get_client", lambda: Client())
+    import sys, types
+    fake = types.SimpleNamespace(Query=types.SimpleNamespace(DESCENDING="DESC"))
+    monkeypatch.setitem(sys.modules, "google.cloud.firestore", fake)
+    assert runstore._fetch(5) == []
+    assert seen["timeout"] == runstore.TIMEOUT_SECONDS
+    assert seen["retry"]._predicate(TimeoutError()) is False
+
+
+def test_busy_read_waits_for_the_read_in_flight(monkeypatch):
+    import threading
+    import time as _time
+    monkeypatch.setattr(runstore, "_cache", {"at": 0.0, "data": None})
+    monkeypatch.setattr(runstore, "_fetch", lambda limit: (_ for _ in ()).throw(AssertionError("no second read")))
+    good = dict(runstore.summarize([runstore.build_record("m", done(0.10), done(0.05))]), stored=True, ok=True)
+    assert runstore._reading.acquire(blocking=False)
+
+    def finish_first_read():
+        _time.sleep(0.2)
+        runstore._cache.update(at=_time.time(), data=good)
+        runstore._reading.release()
+
+    threading.Thread(target=finish_first_read).start()
+    assert runstore.recent_summary() is good  # waited, then served the other read's result

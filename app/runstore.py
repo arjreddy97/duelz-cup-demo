@@ -4,7 +4,9 @@ One document per finished live run: a server timestamp, the model name, and per
 mode the outcome and meter totals. Nothing about the visitor (no IP, no id).
 
 Writes happen on a daemon thread with a short timeout and never raise, so a
-slow or missing Firestore can't break or delay a run. Firestore is used only on
+slow or missing Firestore can't break or delay a run. Reads make one attempt
+(no client-side retries), run one at a time, and a failed read never replaces
+the last good one, so a cold instance can't make the page say "no runs". Firestore is used only on
 Cloud Run (K_SERVICE is set) or when DEMO_FIRESTORE=1, never with the fake
 model, and DEMO_FIRESTORE=0 switches it off. Local dev needs no credentials.
 """
@@ -27,7 +29,9 @@ MODE_FIELDS = ("green", "passed", "total", "cost_usd", "wall_seconds", "input_to
 _client = None
 _client_failed_at = 0.0
 _lock = threading.Lock()
-_cache = {"at": 0.0, "data": None}
+_reading = threading.Lock()  # one Firestore read at a time
+_cache = {"at": 0.0, "data": None}  # last good read
+BUSY_WAIT_SECONDS = 6.0  # a request waits this long for a read already in flight
 
 
 def enabled():
@@ -146,12 +150,19 @@ def save_run_async(record):
 def _fetch(limit):
     client = _get_client()
     if client is None:
+        if enabled():
+            raise RuntimeError("no Firestore client")
         return []
+    from google.api_core.retry import Retry
     from google.cloud import firestore
     q = (client.collection(COLLECTION).order_by("created", direction=firestore.Query.DESCENDING)
          .limit(limit))
     out = []
-    for snap in q.stream(timeout=TIMEOUT_SECONDS):
+    # One attempt. The default retries a timed-out query for up to 5 minutes, silently, which
+    # on a cold instance made every /api/runs time out with an empty table. (retry=None breaks
+    # the library's mid-stream error path, so pass a Retry that never retries.)
+    no_retry = Retry(predicate=lambda exc: False)
+    for snap in q.stream(retry=no_retry, timeout=TIMEOUT_SECONDS):
         d = snap.to_dict() or {}
         created = d.get("created")
         d["created"] = created.timestamp() if hasattr(created, "timestamp") else None
@@ -159,16 +170,37 @@ def _fetch(limit):
     return out
 
 
+def not_ready():
+    """Payload when there is no good read yet: the page shows "loading" and asks again."""
+    return {"runs": [], "aggregate": aggregate([]), "stored": enabled(), "ok": False}
+
+
 def recent_summary(limit=50, recent=10):
-    """Cached ~20 s. Empty when Firestore is off or failing."""
-    now = time.time()
-    if _cache["data"] is not None and now - _cache["at"] < CACHE_SECONDS:
-        return _cache["data"]
+    """Cached ~20 s. On a failed read, or one still busy after BUSY_WAIT_SECONDS, the last good
+    read (or not_ready()). Waiting, rather than returning at once, keeps a request open so Cloud
+    Run gives the instance CPU while the read in flight (e.g. warm()'s) finishes."""
+    data = _cache["data"]
+    if data is not None and time.time() - _cache["at"] < CACHE_SECONDS:
+        return data
+    if not _reading.acquire(timeout=BUSY_WAIT_SECONDS):
+        return data or not_ready()
+    data = _cache["data"]
+    if data is not None and time.time() - _cache["at"] < CACHE_SECONDS:
+        _reading.release()  # the read we waited for has just filled the cache
+        return data
     try:
         runs = _fetch(limit)
     except Exception as exc:
         log.warning("live_runs read failed: %s: %s", type(exc).__name__, str(exc)[:200])
-        runs = []
-    data = dict(summarize(runs, recent), stored=enabled())
-    _cache.update(at=now, data=data)
+        return data or not_ready()
+    finally:
+        _reading.release()
+    data = dict(summarize(runs, recent), stored=enabled(), ok=True)
+    _cache.update(at=time.time(), data=data)
     return data
+
+
+def warm():
+    """Start the first read in the background while the instance starts up."""
+    if enabled():
+        threading.Thread(target=recent_summary, daemon=True).start()

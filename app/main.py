@@ -3,6 +3,7 @@ import asyncio
 import json
 import time
 from collections import deque
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, Request
@@ -14,7 +15,14 @@ from .modes import single_agent, split_verify
 
 STATIC = Path(__file__).resolve().parent / "static"
 
-app = FastAPI(title="Duelz for Gemini", docs_url=None, redoc_url=None)
+
+@asynccontextmanager
+async def lifespan(app):
+    runstore.warm()  # first Firestore read starts with the instance, not with the first visitor
+    yield
+
+
+app = FastAPI(title="Duelz for Gemini", docs_url=None, redoc_url=None, lifespan=lifespan)
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
 
 
@@ -106,7 +114,8 @@ def public_config():
                                    "cached": config.PRICE_CACHED},
             "single_max_turns": config.SINGLE_MAX_TURNS, "split_max_turns": config.SPLIT_MAX_TURNS,
             "split_retry_turns": config.SPLIT_RETRY_TURNS, "mode_max_usd": config.MODE_MAX_USD,
-            "tool_output_chars": config.TOOL_OUTPUT_CHARS, "fake_model": config.FAKE_MODEL,
+            "tool_output_chars": config.TOOL_OUTPUT_CHARS, "stop_at_green": config.STOP_AT_GREEN,
+            "fake_model": config.FAKE_MODEL,
             "live": bool(config.LIVE_ENABLED and (config.api_key() or config.FAKE_MODEL))}
 
 
@@ -116,7 +125,7 @@ async def recent_runs():
     try:
         return await asyncio.wait_for(asyncio.to_thread(runstore.recent_summary), timeout=8)
     except Exception:
-        return {"runs": [], "aggregate": runstore.aggregate([]), "stored": runstore.enabled()}
+        return runstore.not_ready()
 
 
 @app.post("/api/run")

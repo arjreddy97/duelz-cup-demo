@@ -219,15 +219,17 @@ class Tools:
 class LoopResult:
     turns: int = 0
     finished: bool = False
-    stop: str = ""           # "finish", "turn cap", "budget cap", "model error: ..."
+    stop: str = ""           # "finish", "green", "turn cap", "budget cap", "model error: ..."
     summary: str = ""
     actions: list = field(default_factory=list)
 
 
-async def run_loop(model, task, tools, meter, max_turns, budget_usd, on_turn=None):
+async def run_loop(model, task, tools, meter, max_turns, budget_usd, on_turn=None, stop_at_green=False):
     """Drive one agent conversation until it finishes, hits the turn cap or the budget cap.
 
     on_turn(turn, action_name, arg_label, usage) is awaited after every model call.
+    stop_at_green: after each successful edit, run the agent's tests; stop as soon as they pass,
+    otherwise show the result with the edit's observation.
     """
     contents = [{"role": "user", "text": task}]
     res = LoopResult()
@@ -259,6 +261,16 @@ async def run_loop(model, task, tools, meter, max_turns, budget_usd, on_turn=Non
                     await on_turn(turn, name, "", usage)
                 return res
             obs, arg = await tools.execute(action)
+            if stop_at_green and name in ("replace", "write_file") and not obs.startswith("Error"):
+                check = await tools.run_tests()
+                last = tools.last_result
+                if last["failed"] == 0 and last["total"] > 0:
+                    res.actions.append(name)
+                    res.finished, res.stop = True, "green"
+                    if on_turn:
+                        await on_turn(turn, name, arg, usage)
+                    return res
+                obs += "\n[tests after this edit]\n" + check
         res.actions.append(name)
         obs = truncate(obs, tools.output_chars)
         left = max_turns - turn
@@ -272,7 +284,7 @@ async def run_loop(model, task, tools, meter, max_turns, budget_usd, on_turn=Non
 PRELOAD_LIMIT_CHARS = 40_000
 
 
-def build_task(failures, editable, scoped, retry=False, files=None):
+def build_task(failures, editable, scoped, retry=False, files=None, stop_at_green=False):
     """The opening user message. Same wording for both modes; only the scope differs.
 
     files: optional {relative path: content} handed to the agent up front.
@@ -290,6 +302,9 @@ def build_task(failures, editable, scoped, retry=False, files=None):
         f"You may edit: {edit}.",
         f"run_tests runs {run}.",
     ]
+    if stop_at_green:
+        parts.append("After each edit the harness runs your tests and stops you as soon as they pass. "
+                     "The errors are below, so you don't need to run the tests before your first edit.")
     if retry:
         parts.append("An earlier attempt did not make these pass. Start fresh: read the code before editing.")
     parts.append(f"Failing tests ({len(failures)}):")
