@@ -171,7 +171,7 @@ def test_build_task_scopes():
     failures = [{"nodeid": "tests/test_paging.py::test_page_counts", "text": "x\nE   assert 1 == 2\n"}]
     single = build_task(failures, None, scoped=False, files={"invoicer/paging.py": "code\n"})
     assert "You may edit: any file in invoicer/." in single
-    assert "- tests/test_paging.py::test_page_counts: assert 1 == 2" in single
+    assert "- tests/test_paging.py::test_page_counts\n    x\n    E   assert 1 == 2" in single
     assert "--- invoicer/paging.py ---\ncode" in single
     branch = build_task(failures, ["invoicer/paging.py"], scoped=True, retry=True)
     assert "You may edit: only invoicer/paging.py." in branch
@@ -206,3 +206,25 @@ def test_gemini_wrapper_meters_implicit_cache_hits():
     meter.add(usage, 1.0)
     assert (meter.input_tokens, meter.cached_tokens, meter.output_tokens) == (2_000, 8_000, 200)
     assert meter.cost_usd == pytest.approx((2_000 * 0.75 + 8_000 * 0.075 + 200 * 3.75) / 1e6)
+
+
+def test_task_shows_pytest_output_not_just_its_last_line():
+    f = {"nodeid": "tests/test_paging.py::test_page_counts",
+         "text": "tests/test_paging.py:26: in test_page_counts\n    assert f() == [1, 1, 1, 2, 3]\n"
+                 "E   assert [1, 1, 2, 2, 4] == [1, 1, 1, 2, 3]\nE     Use -v to get more diff\n"}
+    task = build_task([f], ["invoicer/paging.py"], scoped=True, stop_at_green=True)
+    assert "E   assert [1, 1, 2, 2, 4] == [1, 1, 1, 2, 3]" in task
+    long = dict(f, text="E   " + "x" * 5000)
+    assert len(build_task([long], None, scoped=False)) < 1500
+
+
+def test_task_keeps_the_error_line_when_frames_are_long():
+    stdlib = "/usr/local/lib/python3.13/calendar.py"
+    text = ("tests/test_dates.py:20: in test_monthly\n    assert add_months(d, 1) == x\n"
+            "invoicer/dates.py:12: in add_months\n    last = calendar.monthrange(y, m)[1]\n"
+            + "".join(f"{stdlib}:{n}: in monthrange\n    {'_validate_month(month)' * 8}\n" for n in range(3))
+            + "E   calendar.IllegalMonthError: bad month number 0; must be 1-12\n")
+    assert len(text) > 600
+    task = build_task([{"nodeid": "tests/test_dates.py::test_monthly", "text": text}], None, scoped=False)
+    assert "E   calendar.IllegalMonthError: bad month number 0; must be 1-12" in task
+    assert "invoicer/dates.py:12: in add_months" in task and stdlib not in task

@@ -62,14 +62,6 @@ def parse_action(text):
     return data
 
 
-def failure_line(f):
-    """Short one-line reason for a failure (last 'E ' line of its traceback)."""
-    lines = [ln.strip() for ln in f.get("text", "").splitlines()]
-    errs = [ln[1:].strip() for ln in lines if ln.startswith("E ")]
-    line = errs[-1] if errs else (lines[-1] if lines else "")
-    return line[:160]
-
-
 class Tools:
     """The agent's tools over one workspace.
 
@@ -282,6 +274,31 @@ async def run_loop(model, task, tools, meter, max_turns, budget_usd, on_turn=Non
 
 
 PRELOAD_LIMIT_CHARS = 40_000
+FAILURE_TEXT_CHARS = 600  # per failing test: pytest's own message, as a real agent would see it
+FRAME_RE = re.compile(r"^(\S+):\d+: in ")
+
+
+def failure_block(f):
+    """'- <node id>' then pytest's failure text, indented: the traceback frames in project files,
+    then every 'E' line (the error itself, which pytest prints last), within FAILURE_TEXT_CHARS.
+    Frames inside Python's own install (absolute paths) are dropped: long, and rarely useful.
+    (A single summary line is not enough: pytest's last line is often 'Use -v to get more diff'.)"""
+    lines = f.get("text", "").rstrip().splitlines()
+    errors = [ln for ln in lines if ln.startswith("E ")]
+    frames, keep = [], True
+    for ln in lines:
+        if ln.startswith("E "):
+            continue
+        m = FRAME_RE.match(ln)
+        if m:
+            keep = not m.group(1).startswith("/")
+        if keep:
+            frames.append(ln)
+    err = truncate("\n".join(errors), FAILURE_TEXT_CHARS)
+    room = FAILURE_TEXT_CHARS - len(err)
+    head = truncate("\n".join(frames), room) if room > 0 else ""
+    text = "\n".join(p for p in (head, err) if p)
+    return f"- {f['nodeid']}\n" + "\n".join("    " + ln for ln in text.splitlines())
 
 
 def build_task(failures, editable, scoped, retry=False, files=None, stop_at_green=False):
@@ -295,7 +312,7 @@ def build_task(failures, editable, scoped, retry=False, files=None, stop_at_gree
         edit = "only " + ", ".join(editable)
     run = ("only these failing tests (this is your part of a larger job)" if scoped
            else "the whole suite, or the test ids you pass")
-    lines = [f"- {f['nodeid']}: {failure_line(f)}" for f in failures]
+    lines = [failure_block(f) for f in failures]
     parts = [
         "Make the failing pytest tests below pass by fixing the source code.",
         f"Project: {sandbox.SOURCE_PKG}/ (the package) and tests/ (pytest tests, read-only).",
@@ -307,7 +324,7 @@ def build_task(failures, editable, scoped, retry=False, files=None, stop_at_gree
                      "The errors are below, so you don't need to run the tests before your first edit.")
     if retry:
         parts.append("An earlier attempt did not make these pass. Start fresh: read the code before editing.")
-    parts.append(f"Failing tests ({len(failures)}):")
+    parts.append(f"Failing tests ({len(failures)}), with pytest's output:")
     text = "\n".join(parts + lines)
     if files:
         blocks = "".join(f"\n--- {rel} ---\n{body.rstrip()}\n" for rel, body in files.items())
